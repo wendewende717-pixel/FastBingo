@@ -3,40 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fast Bingo</title>
+    <title>Fast Bingo Game</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #1c2733;
-            color: white;
-            text-align: center;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #17212b;
+            color: #ffffff;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .card {
-            background: #2b394a;
+        h2 {
+            color: #64b5f6;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #7f91a4;
+            margin-bottom: 20px;
+        }
+        .bingo-card {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            background-color: #242f3d;
+            padding: 12px;
             border-radius: 12px;
-            padding: 20px;
-            margin-top: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            max-width: 350px;
+            width: 100%;
         }
-        h1 { color: #2ea6ff; }
-        .btn {
-            background-color: #2ea6ff;
-            color: white;
-            border: none;
-            padding: 12px 24px;
+        .header-cell {
+            background-color: #1e2c3a;
+            color: #64b5f6;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 45px;
+            border-radius: 6px;
+        }
+        .cell {
+            background-color: #17212b;
+            color: #fff;
             font-size: 16px;
-            border-radius: 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-top: 15px;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+        .cell.marked {
+            background-color: #e57373;
+            color: white;
+        }
+        .cell.free {
+            background-color: #4db6ac;
+            color: white;
+            font-size: 12px;
+        }
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 350px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-primary {
+            background-color: #248bda;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #1e2c3a;
+            color: #64b5f6;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>🎯 Fast Bingo Game</h1>
-        <p>እንኳን ወደ Fast Bingo በሰላም መጡ!</p>
-        <button class="btn" onclick="alert('ጨዋታው በቅርብ ቀን ይጀምራል!')">ካርቴላ ቁረጥ</button>
+
+    <h2>🎯 Fast Bingo</h2>
+    <div class="subtitle">ካርቴላዎን ይምረጡና ይጫወቱ!</div>
+
+    <div class="bingo-card" id="bingoBoard">
+        <div class="header-cell">B</div>
+        <div class="header-cell">I</div>
+        <div class="header-cell">N</div>
+        <div class="header-cell">G</div>
+        <div class="header-cell">O</div>
     </div>
+
+    <div class="controls">
+        <button class="btn btn-secondary" onclick="generateBoard()">አዲስ ካርቴላ</button>
+        <button class="btn btn-primary" onclick="claimBingo()">BINGO!</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        function getRandomNumbers(min, max, count) {
+            let nums = [];
+            while (nums.length < count) {
+                let r = Math.floor(Math.random() * (max - min + 1)) + min;
+                if (nums.indexOf(r) === -1) nums.push(r);
+            }
+            return nums;
+        }
+
+        function generateBoard() {
+            const board = document.getElementById('bingoBoard');
+            // Remove previous cells except headers
+            const cells = board.querySelectorAll('.cell');
+            cells.forEach(cell => cell.remove());
+
+            const colB = getRandomNumbers(1, 15, 5);
+            const colI = getRandomNumbers(16, 30, 5);
+            const colN = getRandomNumbers(31, 45, 4); // 4 numbers + FREE
+            const colG = getRandomNumbers(46, 60, 5);
+            const colO = getRandomNumbers(61, 75, 5);
+
+            for (let row = 0; row < 5; row++) {
+                const rowValues = [colB[row], colI[row], row === 2 ? 'FREE' : (row > 2 ? colN[row-1] : colN[row]), colG[row], colO[row]];
+                
+                rowValues.forEach((val, colIndex) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (val === 'FREE') {
+                        cell.classList.add('marked', 'free');
+                        cell.innerText = 'FREE';
+                    } else {
+                        cell.innerText = val;
+                        cell.onclick = function() {
+                            this.classList.toggle('marked');
+                        };
+                    }
+                    board.appendChild(cell);
+                });
+            }
+        }
+
+        function claimBingo() {
+            tg.showAlert("🎉 ቢንጎ ተረጋግጧል! እንኳን ደስ አለዎት!");
+        }
+
+        // Initialize first board
+        generateBoard();
+    </script>
 </body>
 </html>
