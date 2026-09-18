@@ -9,13 +9,13 @@ from flask import Flask, jsonify, request, render_template
 app = Flask(__name__, template_folder='.')
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "fastbingo123") # አድሚን መግቢያ
 COMMISSION_RATE = 0.20  # 20% Platform Commission
-REFERRAL_BONUS = 10.0   # 10 ETB Referral Bonus for both parties
+REFERRAL_BONUS = 10.0   # 10 ETB Referral Bonus
 
-# IN-MEMORY USER WALLETS DATABASE
-USER_WALLETS = {}  # { user_id: {"balance": 0.0, "referred_by": None} }
+USER_WALLETS = {}
+TOTAL_ADMIN_COMMISSION = 0.0 # የተሰበሰበ አጠቃላይ ኮሚሽን
 
-# 1. GENERATE 600 CARDS
 def generate_600_cards():
     cards = {}
     random.seed(42)
@@ -43,7 +43,6 @@ current_game = {
     "neighbor_bonuses": []
 }
 
-# WALLET & REFERRAL LOGIC
 def get_or_create_wallet(user_id):
     if user_id not in USER_WALLETS:
         USER_WALLETS[user_id] = {"balance": 0.0, "referred_by": None}
@@ -62,59 +61,33 @@ def get_wallet(user_id):
     wallet = get_or_create_wallet(str(user_id))
     return jsonify({"success": True, "user_id": user_id, "balance": wallet["balance"]})
 
-# REFERRAL BONUS SYSTEM (10 ETB for both)
-@app.route('/api/referral', methods=['POST'])
-def process_referral():
+# ADMIN DASHBOARD ENDPOINTS
+@app.route('/api/admin/set-rule', methods=['POST'])
+def admin_set_rule():
     data = request.json or {}
-    new_user = str(data.get("new_user_id"))
-    referrer = str(data.get("referrer_id"))
+    password = data.get("password")
+    new_rule = data.get("rule") # e.g., "SINGLE LINE", "FULL HOUSE", "CORNERS"
     
-    if not new_user or not referrer or new_user == referrer:
-        return jsonify({"success": False, "message": "Invalid referral request"})
+    if password != ADMIN_PASSWORD:
+        return jsonify({"success": False, "message": "የተሳሳተ የአድሚን ፓስወርድ!"})
     
-    new_wallet = get_or_create_wallet(new_user)
-    if new_wallet["referred_by"] is not None:
-        return jsonify({"success": False, "message": "User already referred"})
+    current_game["rule"] = new_rule
+    return jsonify({"success": True, "message": f"የጨዋታው ህግ ወደ '{new_rule}' ተቀይሯል!", "current_rule": new_rule})
+
+@app.route('/api/admin/stats', methods=['POST'])
+def admin_stats():
+    data = request.json or {}
+    password = data.get("password")
     
-    referrer_wallet = get_or_create_wallet(referrer)
-    
-    new_wallet["referred_by"] = referrer
-    new_wallet["balance"] += REFERRAL_BONUS
-    referrer_wallet["balance"] += REFERRAL_BONUS
+    if password != ADMIN_PASSWORD:
+        return jsonify({"success": False, "message": "የተሳሳተ የአድሚን ፓስወርድ!"})
     
     return jsonify({
         "success": True,
-        "message": f"🎉 10 ETB ቦነስ ለሁለቱም ወገን ተጨምሯል!",
-        "new_user_balance": new_wallet["balance"],
-        "referrer_balance": referrer_wallet["balance"]
+        "total_users": len(USER_WALLETS),
+        "total_commission_earned": TOTAL_ADMIN_COMMISSION,
+        "current_game_state": current_game
     })
-
-# DEPOSIT & WITHDRAWAL PLACEHOLDERS (CHAPA / TELEBIRR INTEGRATION)
-@app.route('/api/deposit', methods=['POST'])
-def deposit():
-    data = request.json or {}
-    user_id = str(data.get("user_id"))
-    amount = float(data.get("amount", 0))
-    
-    if amount <= 0 or not user_id:
-        return jsonify({"success": False, "message": "Invalid amount"})
-    
-    wallet = get_or_create_wallet(user_id)
-    wallet["balance"] += amount
-    return jsonify({"success": True, "message": f"{amount} ETB ገቢ ሆኗል!", "new_balance": wallet["balance"]})
-
-@app.route('/api/withdraw', methods=['POST'])
-def withdraw():
-    data = request.json or {}
-    user_id = str(data.get("user_id"))
-    amount = float(data.get("amount", 0))
-    
-    wallet = get_or_create_wallet(user_id)
-    if wallet["balance"] < amount or amount <= 0:
-        return jsonify({"success": False, "message": "በቂ ቀሪ ሂሳብ የለዎትም!"})
-    
-    wallet["balance"] -= amount
-    return jsonify({"success": True, "message": f"{amount} ETB ወጪ ሆኗል!", "new_balance": wallet["balance"]})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
