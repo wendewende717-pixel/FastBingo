@@ -1,6 +1,6 @@
 import os
 import threading
-from flask import Flask
+from flask import Flask, send_file
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
@@ -8,6 +8,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
+    if os.path.exists("index.html"):
+        return send_file("index.html")
     return "FastBingo Bot is Running!", 200
 
 def run_flask():
