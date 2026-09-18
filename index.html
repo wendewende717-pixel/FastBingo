@@ -27,7 +27,6 @@
             align-items: center;
         }
 
-        /* Animated Splash Screen */
         #splashScreen {
             position: fixed;
             top: 0; left: 0;
@@ -75,7 +74,6 @@
             color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer;
         }
 
-        /* Room Selector */
         .room-section { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 10px; }
         .room-card {
             background: var(--card-bg); border: 1px solid #334155;
@@ -85,7 +83,6 @@
         .room-title { font-weight: bold; font-size: 16px; color: var(--accent-color); }
         .room-btn { background: #22c55e; color: #fff; padding: 8px 14px; border-radius: 8px; font-weight: bold; }
 
-        /* Game Board View */
         .game-section { display: none; width: 100%; max-width: 420px; flex-direction: column; align-items: center; }
 
         .header-stats {
@@ -111,7 +108,6 @@
         .card-item.taken { background-color: var(--taken-card); opacity: 0.6; cursor: not-allowed; }
         .card-item.selected { background-color: var(--selected-card); color: #fff; border: 2px solid #fff; }
 
-        /* Active Player Cards Container */
         .my-cards-container {
             display: flex; flex-direction: column; gap: 15px; width: 100%; margin-top: 10px;
         }
@@ -143,7 +139,6 @@
         .action-bar { display: flex; gap: 8px; width: 100%; margin-top: 10px; }
         .btn-opt { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px; background: #3b82f6; color: white; }
 
-        /* Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000;
@@ -154,14 +149,12 @@
 </head>
 <body>
 
-    <!-- Animated Splash Screen -->
     <div id="splashScreen">
         <div class="splash-logo">🎰</div>
         <h1 style="color: #fff; font-size: 24px; font-weight: bold; margin-top: 15px;">FAST BINGO</h1>
         <p style="color: #f59e0b; font-size: 13px; margin-top: -5px;">የቀጥታ የቢንጎ ጨዋታ</p>
     </div>
 
-    <!-- App Header -->
     <div class="app-header">
         <div class="logo-container">
             <div class="logo-icon">🎰</div>
@@ -170,7 +163,11 @@
         <button class="settings-btn" onclick="toggleSettings()">⚙️ ሴቲንግ</button>
     </div>
 
-    <!-- ROOM SELECTOR -->
+    <div class="action-bar" style="margin-bottom: 10px; width:100%; max-width:420px;">
+        <button class="btn-opt" style="background:#22c55e;" onclick="openDepositModal()">📥 ብር አስገባ</button>
+        <button class="btn-opt" style="background:#ef4444;" onclick="openWithdrawModal()">📤 ብር አውጣ</button>
+    </div>
+
     <div class="room-section" id="roomSection">
         <div style="font-weight: bold; color: var(--accent-color);">🎮 የሚጫወቱበትን የብር መጠን ይምረጡ፦</div>
         <div class="room-card" onclick="enterGameRoom(5)"><div class="room-title">ባለ 5 ETB ክፍል</div><div class="room-btn">ግባ ➔</div></div>
@@ -180,7 +177,6 @@
         <div class="room-card" onclick="enterGameRoom(100)"><div class="room-title">ባለ 100 ETB VIP</div><div class="room-btn">ግባ ➔</div></div>
     </div>
 
-    <!-- MAIN GAME VIEW -->
     <div class="game-section" id="gameSection">
         <div class="header-stats">
             <div class="stat-badge">💰 Wallet: <span id="balance">0.00</span> ETB</div>
@@ -201,10 +197,48 @@
         <div class="cards-grid-title" style="margin-top:10px;">🎰 ከ 600 ካርቴላዎች መርጠው ይጫወቱ፦</div>
         <div class="cards-grid" id="cardsGrid"></div>
 
-        <!-- Selected Player Cards Display -->
         <div class="my-cards-container" id="myCardsContainer"></div>
 
         <button style="margin-top:15px; background:transparent; border:none; color:#94a3b8; cursor:pointer;" onclick="exitToRooms()">⬅️ ክፍል መቀየሪያ</button>
+    </div>
+
+    <!-- DEPOSIT MODAL -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <div style="font-size:16px; font-weight:bold; color:var(--accent-color); margin-bottom:12px;">📥 ብር ማስገቢያ አድራሻዎች</div>
+            <p style="font-size:11px; color:#cbd5e1; margin-bottom:8px;">ከታች ባሉት የክፍያ አማራጮች ብር ያስገቡ እና የግብይት ቁጥሩን (Txn ID/Ref) ያስገቡ፦</p>
+            
+            <div style="background:#0f172a; padding:10px; border-radius:8px; font-size:11px; margin-bottom:10px; line-height:1.6;">
+                📱 <b>ቴሌብር:</b> 0910545234<br>
+                🏦 <b>ንግድ ባንክ:</b> 1000322494258<br>
+                🏦 <b>ዳሽን ባንክ:</b> 5815451163011<br>
+                👤 <b>ስም:</b> ወንድምሁነኝ ሞገስ እሸቴ
+            </div>
+
+            <input type="number" id="depositAmount" placeholder="የስገቡት የብር መጠን (ETB)" style="width:90%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #334155; background:#0f172a; color:#fff;">
+            <input type="text" id="depositTxn" placeholder="የግብይት ማረጋገጫ ቁጥር (Txn/Ref No)" style="width:90%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #334155; background:#0f172a; color:#fff;">
+            
+            <button class="btn-card-bingo" onclick="submitDeposit()">ላክ (Submit Request)</button>
+            <button class="close-btn" onclick="closeDepositModal()">ዝጋ</button>
+        </div>
+    </div>
+
+    <!-- WITHDRAW MODAL -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <div style="font-size:16px; font-weight:bold; color:var(--accent-color); margin-bottom:12px;">📤 ብር ማውጫ</div>
+            
+            <input type="number" id="withdrawAmount" placeholder="የሚያወጡት የብር መጠን (ETB)" style="width:90%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #334155; background:#0f172a; color:#fff;">
+            <select id="withdrawMethod" style="width:95%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #334155; background:#0f172a; color:#fff;">
+                <option value="Telebirr">ቴሌብር</option>
+                <option value="CBE">የኢትዮጵያ ንግድ ባንክ</option>
+                <option value="Dashen">ዳሽን ባንክ</option>
+            </select>
+            <input type="text" id="withdrawAccount" placeholder="የእርስዎን አካውንት / ስልክ ቁጥር" style="width:90%; padding:8px; margin-bottom:8px; border-radius:6px; border:1px solid #334155; background:#0f172a; color:#fff;">
+            
+            <button class="btn-card-bingo" style="background:#ef4444;" onclick="submitWithdraw()">የማውጣት ጥያቄ ላክ</button>
+            <button class="close-btn" onclick="closeWithdrawModal()">ዝጋ</button>
+        </div>
     </div>
 
     <!-- SETTINGS MODAL -->
@@ -283,7 +317,6 @@
             }
         }
 
-        // Auto Select Unassigned Cards
         function autoSelectCards() {
             let freeCards = [];
             for(let i = 1; i <= 600; i++) {
@@ -364,6 +397,42 @@
             });
             let data = await res.json();
             tg.showAlert(data.message || data.announcement);
+        }
+
+        function openDepositModal() { document.getElementById('depositModal').style.display = 'flex'; }
+        function closeDepositModal() { document.getElementById('depositModal').style.display = 'none'; }
+        function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
+        function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
+
+        async function submitDeposit() {
+            let amount = document.getElementById('depositAmount').value;
+            let txn = document.getElementById('depositTxn').value;
+            if(!amount || !txn) { tg.showAlert("እባክዎን ሁሉንም መስኮች ይሙሉ!"); return; }
+
+            let res = await fetch('/api/deposit-request', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: userId, user_name: tg.initDataUnsafe?.user?.first_name || "User", amount: amount, txn_id: txn })
+            });
+            let data = await res.json();
+            tg.showAlert(data.message);
+            closeDepositModal();
+        }
+
+        async function submitWithdraw() {
+            let amount = document.getElementById('withdrawAmount').value;
+            let method = document.getElementById('withdrawMethod').value;
+            let account = document.getElementById('withdrawAccount').value;
+            if(!amount || !account) { tg.showAlert("እባክዎን ሁሉንም መስኮች ይሙሉ!"); return; }
+
+            let res = await fetch('/api/withdraw-request', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: userId, user_name: tg.initDataUnsafe?.user?.first_name || "User", amount: amount, method: method, account: account })
+            });
+            let data = await res.json();
+            tg.showAlert(data.message);
+            closeWithdrawModal();
         }
 
         function getUserReferralLink() { return `https://t.me/${botUsername}?start=${userId}`; }
