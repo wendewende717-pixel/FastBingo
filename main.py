@@ -1,4 +1,3 @@
-
 import os
 import json
 import random
@@ -9,20 +8,17 @@ from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__, template_folder='.')
 
-# 1. TELEGRAM BOT SECURITY & CONFIG
 BOT_TOKEN = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
 COMMISSION_RATE = 0.20  # 20% Platform Commission
 
-ROOM_PRICES = [5, 10, 15, 20, 25, 50, 100]  # Game rooms in ETB
-
-# 2. GENERATE 600 UNIQUE BINGO CARDS (Non-Repeating Matrix)
+# 1. 600 UNIQUE NON-REPEATING CARDS
 def generate_600_cards():
     cards = {}
-    random.seed(42)  # Fixed seed to preserve card IDs consistency
+    random.seed(42)
     for card_id in range(1, 601):
         b = random.sample(range(1, 16), 5)
         i = random.sample(range(16, 31), 5)
-        n = random.sample(range(31, 46), 4)  # 4 numbers + FREE space
+        n = random.sample(range(31, 46), 4)
         g = random.sample(range(46, 61), 5)
         o = random.sample(range(61, 76), 5)
         
@@ -37,47 +33,68 @@ def generate_600_cards():
 
 BINGO_CARDS_DB = generate_600_cards()
 
-# 3. TELEGRAM DATA VERIFICATION (Anti-Hack Mechanism)
-def verify_telegram_data(init_data_str):
-    if not init_data_str or BOT_TOKEN == "YOUR_BOT_TOKEN_HERE":
-        return True  # Dev bypass if token not set
-    try:
-        parsed_data = parse_qs(init_data_str)
-        hash_from_tg = parsed_data.get('hash', [''])[0]
-        data_check_arr = [f"{k}={v[0]}" for k, v in parsed_data.items() if k != 'hash']
-        data_check_arr.sort()
-        data_check_string = "\n".join(data_check_arr)
+# GAME STATE MANAGEMENT
+current_game = {
+    "status": "WAITING",  # WAITING, PLAYING, FINISHED
+    "drawn_numbers": [],
+    "rule": "FULL HOUSE", # FULL HOUSE, SINGLE LINE, CORNERS
+    "room_price": 10,
+    "winner": None,
+    "neighbor_bonuses": []
+}
 
-        secret_key = hmac.new(b"WebAppData", BOT_TOKEN.encode(), hashlib.sha256).digest()
-        calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
-        return calculated_hash == hash_from_tg
-    except Exception:
-        return False
+# 2. NEIGHBOR BONUS CALCULATOR (e.g. Card 100 wins -> 99 & 101 get bonus)
+def calculate_neighbor_bonuses(winning_card_id):
+    winning_id = int(winning_card_id)
+    left_neighbor = 600 if winning_id == 1 else winning_id - 1
+    right_neighbor = 1 if winning_id == 600 else winning_id + 1
+    return [left_neighbor, right_neighbor]
 
-# 4. SERVER ROUTES
+# 3. ROUTES
 @app.route('/')
 def home():
     return render_template('index.html')
 
 @app.route('/api/cards', methods=['GET'])
 def get_cards():
-    return jsonify({"success": True, "cards_count": len(BINGO_CARDS_DB), "cards": BINGO_CARDS_DB})
+    return jsonify({"success": True, "cards": BINGO_CARDS_DB})
 
-@app.route('/api/calculate-prize', methods=['POST'])
-def calculate_prize():
-    data = request.json or {}
-    entry_fee = data.get('entry_fee', 10)
-    total_players = data.get('total_players', 1)
+@app.route('/api/game-state', methods=['GET'])
+def get_game_state():
+    return jsonify({"success": True, "game": current_game})
+
+@app.route('/api/draw-number', methods=['POST'])
+def draw_number():
+    if len(current_game["drawn_numbers"]) >= 75:
+        return jsonify({"success": False, "message": "All numbers drawn!"})
     
-    total_pool = entry_fee * total_players
-    admin_commission = total_pool * COMMISSION_RATE
-    winner_prize = total_pool - admin_commission
+    available = [n for n in range(1, 76) if n not in current_game["drawn_numbers"]]
+    next_num = random.choice(available)
+    current_game["drawn_numbers"].append(next_num)
+    
+    return jsonify({"success": True, "drawn_number": next_num, "all_drawn": current_game["drawn_numbers"]})
+
+@app.route('/api/verify-bingo', methods=['POST'])
+def verify_bingo():
+    data = request.json or {}
+    card_id = data.get("card_id")
+    player_name = data.get("player_name", "Anonymous Player")
+    
+    if not card_id or int(card_id) not in BINGO_CARDS_DB:
+        return jsonify({"success": False, "message": "Invalid Card ID"})
+    
+    # Calculate Neighbor Bonuses
+    neighbors = calculate_neighbor_bonuses(card_id)
+    current_game["status"] = "FINISHED"
+    current_game["winner"] = {"card_id": card_id, "player_name": player_name}
+    current_game["neighbor_bonuses"] = neighbors
     
     return jsonify({
         "success": True,
-        "total_pool": total_pool,
-        "admin_commission": admin_commission,
-        "winner_prize": winner_prize
+        "is_winner": True,
+        "winner_card": card_id,
+        "neighbor_bonus_cards": neighbors,
+        "announcement": f"🎉 ካርቴላ #{card_id} አሸንፏል! ጎረቤቶች #{neighbors[0]} እና #{neighbors[1]} ነፃ ቦነስ አግኝተዋል!"
     })
 
 if __name__ == '__main__':
