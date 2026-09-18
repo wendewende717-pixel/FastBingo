@@ -42,218 +42,114 @@
         }
 
         .splash-logo {
-            width: 90px;
-            height: 90px;
+            width: 90px; height: 90px;
             background: linear-gradient(135deg, #f59e0b, #ef4444);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 45px;
             box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
             animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+            0% { transform: scale(0.95); }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(0.95); }
         }
 
-        /* App Header */
         .app-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 420px;
-            margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; max-width: 420px; margin-bottom: 10px;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
+        .logo-container { display: flex; align-items: center; gap: 8px; }
         .logo-icon {
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             background: linear-gradient(135deg, #f59e0b, #ef4444);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 18px;
-        }
-
-        .brand-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #fff;
         }
 
         .settings-btn {
-            background: var(--card-bg);
-            border: 1px solid #334155;
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
+            background: var(--card-bg); border: 1px solid #334155;
+            color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer;
         }
 
-        /* Room Selection View */
-        .room-section {
-            width: 100%;
-            max-width: 420px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        /* Room Selector */
+        .room-section { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 10px; }
         .room-card {
-            background: var(--card-bg);
-            border: 1px solid #334155;
-            padding: 14px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s;
+            background: var(--card-bg); border: 1px solid #334155;
+            padding: 14px; border-radius: 12px; display: flex;
+            justify-content: space-between; align-items: center; cursor: pointer;
         }
-
-        .room-card:active { transform: scale(0.98); }
-
         .room-title { font-weight: bold; font-size: 16px; color: var(--accent-color); }
-        .room-desc { font-size: 12px; color: #94a3b8; }
-        .room-btn { background: #22c55e; color: #fff; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; }
+        .room-btn { background: #22c55e; color: #fff; padding: 8px 14px; border-radius: 8px; font-weight: bold; }
 
-        /* Main Game View */
-        .game-section {
-            display: none;
-            width: 100%;
-            max-width: 420px;
-            flex-direction: column;
-            align-items: center;
-        }
+        /* Game Board View */
+        .game-section { display: none; width: 100%; max-width: 420px; flex-direction: column; align-items: center; }
 
         .header-stats {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 10px;
-            font-size: 12px;
+            display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-size: 12px;
         }
-
-        .stat-badge {
-            background-color: var(--card-bg);
-            padding: 6px 10px;
-            border-radius: 20px;
-            border: 1px solid #334155;
-        }
+        .stat-badge { background-color: var(--card-bg); padding: 6px 10px; border-radius: 20px; border: 1px solid #334155; }
 
         .cards-grid-title {
-            width: 100%;
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--accent-color);
-            text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
-            margin-bottom: 8px;
-            text-align: center;
+            width: 100%; font-size: 15px; font-weight: 800; color: var(--accent-color);
+            text-shadow: 0 0 8px rgba(251, 191, 36, 0.5); margin-bottom: 8px; text-align: center;
         }
 
         .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 6px;
-            width: 100%;
-            height: 220px;
-            overflow-y: auto;
-            background: var(--card-bg);
-            padding: 8px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #334155;
+            display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
+            width: 100%; height: 180px; overflow-y: auto; background: var(--card-bg);
+            padding: 8px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #334155;
         }
 
         .card-item {
-            padding: 8px 0;
-            text-align: center;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 11px;
-            cursor: pointer;
+            padding: 8px 0; text-align: center; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer;
         }
-
         .card-item.free { background-color: var(--free-card); color: #000; }
         .card-item.taken { background-color: var(--taken-card); opacity: 0.6; cursor: not-allowed; }
         .card-item.selected { background-color: var(--selected-card); color: #fff; border: 2px solid #fff; }
 
-        .controls {
-            display: flex;
-            gap: 6px;
-            width: 100%;
-            margin-top: 10px;
+        /* Active Player Cards Container */
+        .my-cards-container {
+            display: flex; flex-direction: column; gap: 15px; width: 100%; margin-top: 10px;
         }
 
-        .btn {
-            flex: 1;
-            padding: 10px 4px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 12px;
+        .individual-card {
+            background: var(--card-bg); border: 1px solid #334155; padding: 10px; border-radius: 10px;
         }
 
-        .btn-bingo { background-color: #22c55e; color: white; }
-        .btn-action { background-color: #3b82f6; color: white; }
-        .btn-share { background-color: #8b5cf6; color: white; }
+        .card-header-bar {
+            display: flex; justify-content: space-between; font-weight: bold; color: var(--accent-color); margin-bottom: 6px; font-size: 14px;
+        }
 
-        /* Modal Overlay */
+        .bingo-board {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+        }
+
+        .grid-header { background-color: #334155; color: #38bdf8; font-weight: bold; text-align: center; padding: 6px 0; border-radius: 4px; font-size: 12px; }
+        .cell {
+            background-color: #0f172a; display: flex; align-items: center; justify-content: center;
+            height: 32px; border-radius: 4px; font-weight: bold; cursor: pointer; border: 1px solid #334155; font-size: 12px;
+        }
+        .cell.marked { background-color: #ef4444; color: white; }
+
+        .btn-card-bingo {
+            width: 100%; margin-top: 8px; padding: 8px; background: #22c55e; color: #fff; border: none;
+            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;
+        }
+
+        .action-bar { display: flex; gap: 8px; width: 100%; margin-top: 10px; }
+        .btn-opt { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px; background: #3b82f6; color: white; }
+
+        /* Modal */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000;
         }
-
-        .modal-content {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            width: 85%;
-            max-width: 360px;
-            border: 1px solid #334155;
-        }
-
-        .close-btn {
-            width: 100%;
-            margin-top: 15px;
-            padding: 10px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Preview Card Matrix */
-        .preview-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-            margin-top: 10px;
-        }
-
-        .preview-header { background: #334155; color: #38bdf8; font-weight: bold; text-align: center; padding: 6px; border-radius: 4px; }
-        .preview-cell { background: #0f172a; color: #fff; text-align: center; padding: 8px 0; border-radius: 4px; font-weight: bold; font-size: 12px; }
+        .modal-content { background: var(--card-bg); padding: 20px; border-radius: 12px; width: 85%; max-width: 360px; border: 1px solid #334155; }
+        .close-btn { width: 100%; margin-top: 15px; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -269,57 +165,22 @@
     <div class="app-header">
         <div class="logo-container">
             <div class="logo-icon">🎰</div>
-            <div class="brand-title">FAST BINGO</div>
+            <div style="font-size: 18px; font-weight: bold;">FAST BINGO</div>
         </div>
         <button class="settings-btn" onclick="toggleSettings()">⚙️ ሴቲንግ</button>
     </div>
 
-    <!-- VIEW 1: Room Price Selector -->
+    <!-- ROOM SELECTOR -->
     <div class="room-section" id="roomSection">
-        <div style="font-weight: bold; color: var(--accent-color); margin-bottom: 5px;">🎮 የሚጫወቱበትን የብር መጠን ይምረጡ፦</div>
-        
-        <div class="room-card" onclick="enterGameRoom(5)">
-            <div>
-                <div class="room-title">ባለ 5 ETB ክፍል</div>
-                <div class="room-desc">ትንሽ መወራረጃ - ለጀማሪዎች</div>
-            </div>
-            <div class="room-btn">ግባ ➔</div>
-        </div>
-
-        <div class="room-card" onclick="enterGameRoom(10)">
-            <div>
-                <div class="room-title">ባለ 10 ETB ክፍል</div>
-                <div class="room-desc">ተወዳጅ ክፍል - መካከለኛ አሸናፊነት</div>
-            </div>
-            <div class="room-btn">ግባ ➔</div>
-        </div>
-
-        <div class="room-card" onclick="enterGameRoom(20)">
-            <div>
-                <div class="room-title">ባለ 20 ETB ክፍል</div>
-                <div class="room-desc">ከፍተኛ ሽልማት</div>
-            </div>
-            <div class="room-btn">ግባ ➔</div>
-        </div>
-
-        <div class="room-card" onclick="enterGameRoom(50)">
-            <div>
-                <div class="room-title">ባለ 50 ETB ክፍል</div>
-                <div class="room-desc">የፕሮዎች ክፍል</div>
-            </div>
-            <div class="room-btn">ግባ ➔</div>
-        </div>
-
-        <div class="room-card" onclick="enterGameRoom(100)">
-            <div>
-                <div class="room-title">ባለ 100 ETB VIP ክፍል</div>
-                <div class="room-desc">ትልቅ የጃክፖት ሽልማት</div>
-            </div>
-            <div class="room-btn">ግባ ➔</div>
-        </div>
+        <div style="font-weight: bold; color: var(--accent-color);">🎮 የሚጫወቱበትን የብር መጠን ይምረጡ፦</div>
+        <div class="room-card" onclick="enterGameRoom(5)"><div class="room-title">ባለ 5 ETB ክፍል</div><div class="room-btn">ግባ ➔</div></div>
+        <div class="room-card" onclick="enterGameRoom(10)"><div class="room-title">ባለ 10 ETB ክፍል</div><div class="room-btn">ግባ ➔</div></div>
+        <div class="room-card" onclick="enterGameRoom(20)"><div class="room-title">ባለ 20 ETB ክፍል</div><div class="room-btn">ግባ ➔</div></div>
+        <div class="room-card" onclick="enterGameRoom(50)"><div class="room-title">ባለ 50 ETB ክፍል</div><div class="room-btn">ግባ ➔</div></div>
+        <div class="room-card" onclick="enterGameRoom(100)"><div class="room-title">ባለ 100 ETB VIP</div><div class="room-btn">ግባ ➔</div></div>
     </div>
 
-    <!-- VIEW 2: Main Game Board -->
+    <!-- MAIN GAME VIEW -->
     <div class="game-section" id="gameSection">
         <div class="header-stats">
             <div class="stat-badge">💰 Wallet: <span id="balance">0.00</span> ETB</div>
@@ -331,41 +192,30 @@
             🎯 የወጣ ቁጥር: -
         </div>
 
-        <div class="cards-grid-title">🎰 ከ 600 ካርቴላዎች መርጠው ይጫወቱ፦</div>
+        <div class="action-bar">
+            <button class="btn-opt" onclick="autoSelectCards()">🎲 አውቶማቲክ ካርቴላ ምረጥ</button>
+            <button class="btn-opt" style="background:#8b5cf6;" onclick="shareReferralLink()">📤 ሼር</button>
+            <button class="btn-opt" style="background:#0ea5e9;" onclick="copyReferralLink()">📋 ኮፒ</button>
+        </div>
+
+        <div class="cards-grid-title" style="margin-top:10px;">🎰 ከ 600 ካርቴላዎች መርጠው ይጫወቱ፦</div>
         <div class="cards-grid" id="cardsGrid"></div>
 
-        <div class="controls">
-            <button class="btn btn-action" onclick="drawNextNumber()">🎲 ቁጥር ጥራ</button>
-            <button class="btn btn-share" onclick="shareReferralLink()">📤 ሼር</button>
-            <button class="btn btn-action" onclick="copyReferralLink()">📋 ኮፒ</button>
-            <button class="btn btn-bingo" onclick="verifyBingo()">🔥 BINGO!</button>
-        </div>
-        
-        <button style="margin-top:12px; background:transparent; border:none; color:#94a3b8; cursor:pointer;" onclick="exitToRooms()">⬅️ ክፍል መቀየሪያ</button>
+        <!-- Selected Player Cards Display -->
+        <div class="my-cards-container" id="myCardsContainer"></div>
+
+        <button style="margin-top:15px; background:transparent; border:none; color:#94a3b8; cursor:pointer;" onclick="exitToRooms()">⬅️ ክፍል መቀየሪያ</button>
     </div>
 
-    <!-- Modal 1: Settings -->
+    <!-- SETTINGS MODAL -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <div style="font-size:16px; font-weight:bold; color:var(--accent-color); margin-bottom:12px;">⚙️ የቦቱ ሴቲንጎች</div>
-            <div style="display:flex; justify-shadow:space-between; padding:8px 0; border-bottom:1px solid #334155;">
-                <span>🔊 የድምፅ ማስታወቂያ</span>
-                <input type="checkbox" checked>
-            </div>
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #334155;">
-                <span>🤖 Auto-Pilot Mode</span>
-                <input type="checkbox">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #334155;">
+                <span>🤖 Auto-Pilot (አውቶማቲክ መጫወቻ)</span>
+                <input type="checkbox" id="autoPilotToggle" onchange="toggleAutoPilot(this.checked)">
             </div>
             <button class="close-btn" onclick="toggleSettings()">ዝጋ</button>
-        </div>
-    </div>
-
-    <!-- Modal 2: Card Preview Details -->
-    <div class="modal" id="previewModal">
-        <div class="modal-content">
-            <div style="font-size:15px; font-weight:bold; color:var(--accent-color); text-align:center;" id="previewCardTitle">ካርቴላ #-- ዝርዝር</div>
-            <div class="preview-grid" id="previewGrid"></div>
-            <button class="close-btn" onclick="closePreview()">ተመለስ</button>
         </div>
     </div>
 
@@ -377,9 +227,9 @@
         let botUsername = "FastBingoBot";
         let selectedCards = [];
         let allCardsDB = {};
-        let currentRoomPrice = 10;
+        let currentDrawnNumbers = [];
+        let isAutoPilot = false;
 
-        // Hide Splash Screen after 1.5s
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splashScreen');
@@ -394,9 +244,7 @@
             try {
                 let res = await fetch(`/api/wallet/${userId}`);
                 let data = await res.json();
-                if(data.success) {
-                    document.getElementById('balance').innerText = data.balance.toFixed(2);
-                }
+                if(data.success) document.getElementById('balance').innerText = data.balance.toFixed(2);
             } catch(e) {}
         }
 
@@ -412,7 +260,6 @@
         }
 
         function enterGameRoom(price) {
-            currentRoomPrice = price;
             document.getElementById('selectedRoomPrice').innerText = price;
             document.getElementById('roomSection').style.display = 'none';
             document.getElementById('gameSection').style.display = 'flex';
@@ -429,108 +276,100 @@
             for (let i = 1; i <= 600; i++) {
                 const item = document.createElement('div');
                 item.className = 'card-item free';
+                item.id = `card-select-${i}`;
                 item.innerText = '#' + i;
-                
-                // Long press / Double click to preview card numbers
-                item.onclick = () => selectCard(i, item);
-                item.oncontextmenu = (e) => {
-                    e.preventDefault();
-                    previewCardNumbers(i);
-                };
-                
+                item.onclick = () => selectCard(i);
                 grid.appendChild(item);
             }
         }
 
-        function selectCard(cardId, element) {
+        // Auto Select Unassigned Cards
+        function autoSelectCards() {
+            let freeCards = [];
+            for(let i = 1; i <= 600; i++) {
+                if(!selectedCards.includes(i)) freeCards.push(i);
+            }
+            while(selectedCards.length < 6 && freeCards.length > 0) {
+                let randomIndex = Math.floor(Math.random() * freeCards.length);
+                let picked = freeCards.splice(randomIndex, 1)[0];
+                selectCard(picked);
+            }
+        }
+
+        function selectCard(cardId) {
+            const el = document.getElementById(`card-select-${cardId}`);
             if (selectedCards.includes(cardId)) {
                 selectedCards = selectedCards.filter(id => id !== cardId);
-                element.className = 'card-item free';
+                if(el) el.className = 'card-item free';
             } else {
                 if (selectedCards.length >= 6) {
                     tg.showAlert("በአንድ ጨዋታ ከ 6 ካርቴላ በላይ መያዝ አይችሉም!");
                     return;
                 }
                 selectedCards.push(cardId);
-                element.className = 'card-item selected';
-                previewCardNumbers(cardId); // Show card numbers upon selection
+                if(el) el.className = 'card-item selected';
             }
             document.getElementById('selectedCount').innerText = selectedCards.length;
+            renderMyCards();
         }
 
-        function previewCardNumbers(cardId) {
-            const card = allCardsDB[cardId];
-            if (!card) return;
+        function renderMyCards() {
+            const container = document.getElementById('myCardsContainer');
+            container.innerHTML = '';
 
-            document.getElementById('previewCardTitle').innerText = `📋 የካርቴላ #${cardId} ቁጥሮች ዝርዝር`;
-            const grid = document.getElementById('previewGrid');
-            grid.innerHTML = `
-                <div class="preview-header">B</div>
-                <div class="preview-header">I</div>
-                <div class="preview-header">N</div>
-                <div class="preview-header">G</div>
-                <div class="preview-header">O</div>
-            `;
+            selectedCards.forEach(cardId => {
+                const card = allCardsDB[cardId];
+                if(!card) return;
 
-            for (let row = 0; row < 5; row++) {
-                ['B', 'I', 'N', 'G', 'O'].forEach(col => {
-                    const cell = document.createElement('div');
-                    cell.className = 'preview-cell';
-                    cell.innerText = card[col][row];
-                    grid.appendChild(cell);
-                });
-            }
-            document.getElementById('previewModal').style.display = 'flex';
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'individual-card';
+                
+                let html = `
+                    <div class="card-header-bar">
+                        <span>📋 ካርቴላ #${cardId}</span>
+                    </div>
+                    <div class="bingo-board">
+                        <div class="grid-header">B</div><div class="grid-header">I</div>
+                        <div class="grid-header">N</div><div class="grid-header">G</div>
+                        <div class="grid-header">O</div>
+                `;
+
+                for (let row = 0; row < 5; row++) {
+                    ['B', 'I', 'N', 'G', 'O'].forEach(col => {
+                        let val = card[col][row];
+                        let isMarked = currentDrawnNumbers.includes(val) && isAutoPilot ? 'marked' : '';
+                        html += `<div class="cell ${isMarked}" onclick="this.classList.toggle('marked')">${val}</div>`;
+                    });
+                }
+
+                html += `</div>
+                    <button class="btn-card-bingo" onclick="verifyBingoForCard(${cardId})">🔥 BINGO (ካርቴላ #${cardId})</button>
+                `;
+                cardDiv.innerHTML = html;
+                container.appendChild(cardDiv);
+            });
         }
 
-        function closePreview() {
-            document.getElementById('previewModal').style.display = 'none';
+        function toggleAutoPilot(status) {
+            isAutoPilot = status;
+            tg.showAlert(isAutoPilot ? "🤖 አውቶማቲክ መጫወቻ (Auto-Pilot) በራረሰ!" : "🤖 Auto-Pilot ጠፍቷል!");
+            renderMyCards();
         }
 
-        async function drawNextNumber() {
-            let res = await fetch('/api/draw-number', { method: 'POST' });
-            let data = await res.json();
-            if(data.success) {
-                document.getElementById('drawnBox').innerText = `🎯 የወጣ ቁጥር: ${data.drawn_number}`;
-            }
-        }
-
-        async function verifyBingo() {
-            if(selectedCards.length === 0) {
-                tg.showAlert("እባክዎን መጀመሪያ ካርቴላ ይምረጡ!");
-                return;
-            }
+        async function verifyBingoForCard(cardId) {
             let res = await fetch('/api/verify-bingo', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ card_id: selectedCards[0], player_name: tg.initDataUnsafe?.user?.first_name || "Player" })
+                body: JSON.stringify({ card_id: cardId, player_name: tg.initDataUnsafe?.user?.first_name || "Player" })
             });
             let data = await res.json();
-            if(data.success) {
-                tg.showAlert(data.announcement);
-            }
+            tg.showAlert(data.message || data.announcement);
         }
 
-        function getUserReferralLink() {
-            return `https://t.me/${botUsername}?start=${userId}`;
-        }
-
-        function shareReferralLink() {
-            let link = getUserReferralLink();
-            let text = "🎮 ና Fast Bingo እንጫወት! በዚህ ሊንክ ተመዝግበህ 10 ETB ነፃ ቦነስ ውሰድ፦";
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
-        }
-
-        function copyReferralLink() {
-            navigator.clipboard.writeText(getUserReferralLink()).then(() => {
-                tg.showAlert("✅ የሪፌራል ሊንክዎ ተቀድቷል!");
-            });
-        }
-
-        function toggleSettings() {
-            const modal = document.getElementById('settingsModal');
-            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
-        }
+        function getUserReferralLink() { return `https://t.me/${botUsername}?start=${userId}`; }
+        function shareReferralLink() { tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(getUserReferralLink())}&text=${encodeURIComponent('🎮 ና Fast Bingo እንጫወት!')}`); }
+        function copyReferralLink() { navigator.clipboard.writeText(getUserReferralLink()).then(() => tg.showAlert("✅ የሪፌራል ሊንክዎ ተቀድቷል!")); }
+        function toggleSettings() { const modal = document.getElementById('settingsModal'); modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex'; }
 
         loadCardsData();
         fetchWallet();
