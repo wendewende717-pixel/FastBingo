@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fast Bingo - Complete Ecosystem</title>
+    <title>Fast Bingo - Pro Ecosystem</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -13,6 +13,7 @@
             --taken-card: #ef4444;
             --selected-card: #3b82f6;
             --text-color: #ffffff;
+            --accent-color: #f59e0b;
         }
 
         body {
@@ -20,89 +21,144 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
+        /* Logo and Header */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 420px;
+            margin-bottom: 10px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .settings-btn {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
         .announcement-bar {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             background: linear-gradient(90deg, #f59e0b, #d97706);
             color: #000;
             font-weight: bold;
             text-align: center;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 14px;
+            margin-bottom: 10px;
+            font-size: 13px;
         }
 
         .header-stats {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 400px;
-            margin-bottom: 12px;
-            font-size: 13px;
+            max-width: 420px;
+            margin-bottom: 10px;
+            font-size: 12px;
         }
 
         .stat-badge {
             background-color: var(--card-bg);
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 20px;
             border: 1px solid #334155;
         }
 
         .drawn-box {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             background: #334155;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
             text-align: center;
-            margin-bottom: 12px;
-            font-size: 18px;
+            margin-bottom: 10px;
+            font-size: 16px;
             font-weight: bold;
             color: #38bdf8;
         }
 
+        /* Full Screen Card Selector */
+        .cards-grid-title {
+            width: 100%;
+            max-width: 420px;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 6px;
-            max-width: 400px;
+            max-width: 420px;
             width: 100%;
-            max-height: 140px;
+            height: 220px; /* Full view expanded height */
             overflow-y: auto;
             background: var(--card-bg);
-            padding: 10px;
+            padding: 8px;
             border-radius: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #334155;
         }
 
         .card-item {
-            padding: 8px;
+            padding: 8px 0;
             text-align: center;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
         }
 
         .card-item.free { background-color: var(--free-card); color: #000; }
-        .card-item.taken { background-color: var(--taken-card); opacity: 0.6; }
-        .card-item.selected { background-color: var(--selected-card); border: 2px solid #fff; }
+        .card-item.taken { background-color: var(--taken-card); opacity: 0.6; cursor: not-allowed; }
+        .card-item.selected { background-color: var(--selected-card); color: #fff; border: 2px solid #fff; }
 
         .bingo-board {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
+            gap: 4px;
             background-color: var(--card-bg);
-            padding: 10px;
-            border-radius: 12px;
-            max-width: 400px;
+            padding: 8px;
+            border-radius: 10px;
+            max-width: 420px;
             width: 100%;
         }
 
@@ -111,8 +167,9 @@
             color: #38bdf8;
             font-weight: bold;
             text-align: center;
-            padding: 10px 0;
-            border-radius: 6px;
+            padding: 8px 0;
+            border-radius: 4px;
+            font-size: 13px;
         }
 
         .cell {
@@ -120,36 +177,98 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 44px;
-            border-radius: 6px;
+            height: 38px;
+            border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
+            border: 1px solid #334155;
+            font-size: 13px;
         }
 
         .cell.marked { background-color: #ef4444; color: white; }
 
         .controls {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
-            max-width: 400px;
-            margin-top: 12px;
+            max-width: 420px;
+            margin-top: 10px;
         }
 
         .btn {
             flex: 1;
-            padding: 10px;
+            padding: 10px 4px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 12px;
         }
 
         .btn-bingo { background-color: #22c55e; color: white; }
         .btn-action { background-color: #3b82f6; color: white; }
+        .btn-share { background-color: #8b5cf6; color: white; }
+
+        /* Modal Overlay for Settings */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 360px;
+            border: 1px solid #334155;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: var(--accent-color);
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #334155;
+            font-size: 13px;
+        }
+
+        .close-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Logo & Header -->
+    <div class="app-header">
+        <div class="logo-container">
+            <div class="logo-icon">🎰</div>
+            <div class="brand-title">FAST BINGO</div>
+        </div>
+        <button class="settings-btn" onclick="toggleSettings()">⚙️ ሴቲንግ</button>
+    </div>
 
     <div class="announcement-bar" id="ruleBanner">📢 ህግ፡ FULL HOUSE</div>
 
@@ -161,6 +280,8 @@
 
     <div class="drawn-box" id="drawnBox">🎯 የወጣ ቁጥር: -</div>
 
+    <!-- Full Screen Cards Grid -->
+    <div class="cards-grid-title">ከ 600 ካርቴላዎች መርጠው ይጫወቱ፦</div>
     <div class="cards-grid" id="cardsGrid"></div>
 
     <div class="bingo-board" id="bingoBoard">
@@ -173,8 +294,33 @@
 
     <div class="controls">
         <button class="btn btn-action" onclick="drawNextNumber()">🎲 ቁጥር ጥራ</button>
-        <button class="btn btn-action" onclick="getReferralLink()">🔗 10 ETB ቦነስ</button>
+        <button class="btn btn-share" onclick="shareReferralLink()">📤 ሼር አድርግ</button>
+        <button class="btn btn-action" onclick="copyReferralLink()">📋 ኮፒ ሊንክ</button>
         <button class="btn btn-bingo" onclick="verifyBingo()">🔥 BINGO!</button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-title">⚙️ የቦቱ ሴቲንጎች</div>
+            <div class="setting-row">
+                <span>🔊 የድምፅ ማስታወቂያ</span>
+                <input type="checkbox" id="soundToggle" checked>
+            </div>
+            <div class="setting-row">
+                <span>📳 የንዝረት ጥቆማ (1/2 Away)</span>
+                <input type="checkbox" id="vibeToggle" checked>
+            </div>
+            <div class="setting-row">
+                <span>🤖 Auto-Pilot Mode</span>
+                <input type="checkbox" id="autoPilotToggle">
+            </div>
+            <div class="setting-row">
+                <span>📊 የታሪክ እና መዛግብት</span>
+                <button style="background:#334155; color:#fff; border:none; padding:4px 8px; border-radius:4px;" onclick="tg.showAlert('የጨዋታ ታሪክዎ ባዶ ነው')">ကြည့်ስ</button>
+            </div>
+            <button class="close-btn" onclick="toggleSettings()">ዝጋ</button>
+        </div>
     </div>
 
     <script>
@@ -182,7 +328,9 @@
         tg.expand();
 
         let userId = tg.initDataUnsafe?.user?.id || "guest_user";
+        let botUsername = "FastBingoBot"; // የቦትህ Username
         let selectedCards = [];
+        let allCardsDB = {};
 
         async function fetchWallet() {
             try {
@@ -190,6 +338,17 @@
                 let data = await res.json();
                 if(data.success) {
                     document.getElementById('balance').innerText = data.balance.toFixed(2);
+                }
+            } catch(e) {}
+        }
+
+        async function loadCardsData() {
+            try {
+                let res = await fetch('/api/cards');
+                let data = await res.json();
+                if(data.success) {
+                    allCardsDB = data.cards;
+                    initCardSelector();
                 }
             } catch(e) {}
         }
@@ -223,6 +382,33 @@
                 element.className = 'card-item selected';
             }
             document.getElementById('selectedCount').innerText = selectedCards.length;
+            if(selectedCards.length > 0) {
+                renderBingoBoard(selectedCards[0]);
+            }
+        }
+
+        function renderBingoBoard(cardId) {
+            const board = document.getElementById('bingoBoard');
+            board.innerHTML = `
+                <div class="grid-header">B</div>
+                <div class="grid-header">I</div>
+                <div class="grid-header">N</div>
+                <div class="grid-header">G</div>
+                <div class="grid-header">O</div>
+            `;
+            const card = allCardsDB[cardId];
+            if (!card) return;
+
+            for (let row = 0; row < 5; row++) {
+                ['B', 'I', 'N', 'G', 'O'].forEach(col => {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    let val = card[col][row];
+                    cell.innerText = val;
+                    cell.onclick = () => cell.classList.toggle('marked');
+                    board.appendChild(cell);
+                });
+            }
         }
 
         async function drawNextNumber() {
@@ -251,12 +437,33 @@
             }
         }
 
-        function getReferralLink() {
-            let link = `https://t.me/YOUR_BOT_USERNAME?start=${userId}`;
-            tg.showAlert(`🔗 የግብዣ ሊንክዎ፡\n${link}\n\nበዚህ ሊንክ ለሚገቡ አዲስ ተጫዋቾች ለሁለታችሁም 10 ETB ቦነስ ይገባል!`);
+        // UNIQUE REFERRAL LINK GENERATOR
+        function getUserReferralLink() {
+            return `https://t.me/${botUsername}?start=${userId}`;
         }
 
-        initCardSelector();
+        function shareReferralLink() {
+            let link = getUserReferralLink();
+            let text = "🎮 ና Fast Bingo እንጫወት! በዚህ ሊንክ ተመዝግበህ 10 ETB ነፃ ቦነስ ውሰድ፦";
+            let shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`;
+            tg.openTelegramLink(shareUrl);
+        }
+
+        function copyReferralLink() {
+            let link = getUserReferralLink();
+            navigator.clipboard.writeText(link).then(() => {
+                tg.showAlert("✅ የሪፌራል ሊንክዎ ተቀድቷል (Copied)!\nአሁን ለወዳጅ ዘመድዎ ሼር ማድረግ ይችላሉ።");
+            }).catch(() => {
+                tg.showAlert(`የእርስዎ ሊንክ፦\n${link}`);
+            });
+        }
+
+        function toggleSettings() {
+            const modal = document.getElementById('settingsModal');
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        loadCardsData();
         fetchWallet();
     </script>
 </body>
