@@ -45,6 +45,7 @@
       box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
       margin-bottom: 30px;
       animation: pulse 2s infinite alternate;
+      object-fit: cover;
     }
 
     @keyframes pulse {
@@ -173,6 +174,7 @@
       height: 38px;
       border-radius: 10px;
       border: 2px solid #f59e0b;
+      object-fit: cover;
     }
 
     .brand-name {
@@ -268,7 +270,7 @@
 
   <!-- 1. Splash Screen -->
   <div id="splash-screen">
-    <img src="https://i.ibb.co/L5Z4d7y/fast-bingo-logo.jpg" alt="Fast Bingo Logo" class="splash-logo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Fast Bingo Logo" class="splash-logo">
     <button class="play-btn-main" onclick="goToRooms()">ተጫወት (PLAY)</button>
   </div>
 
@@ -325,7 +327,7 @@
   <div id="game-screen">
     <div class="app-header">
       <div class="brand">
-        <img src="https://i.ibb.co/L5Z4d7y/fast-bingo-logo.jpg" class="brand-img" alt="Logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" class="brand-img" alt="Logo">
         <span class="brand-name">FAST BINGO</span>
       </div>
       <button class="back-btn" onclick="backToRooms()">⬅ ክፍል ቀይር</button>
@@ -365,26 +367,22 @@
       window.Telegram.WebApp.expand();
     }
 
-    // Flow 1: Play button clicks to show Room Selection
     function goToRooms() {
       document.getElementById('splash-screen').style.display = 'none';
       document.getElementById('room-selection-screen').style.display = 'flex';
     }
 
-    // Flow 2: Room Selection clicks to show Cartela Grid
     function selectRoom(roomName) {
       document.getElementById('selectedRoomDisplay').innerText = roomName;
       document.getElementById('room-selection-screen').style.display = 'none';
       document.getElementById('game-screen').style.display = 'flex';
     }
 
-    // Back button to change room
     function backToRooms() {
       document.getElementById('game-screen').style.display = 'none';
       document.getElementById('room-selection-screen').style.display = 'flex';
     }
 
-    // Populate Cartela Grid (#1 to #30)
     const gridContainer = document.getElementById('grid');
     for (let i = 1; i <= 30; i++) {
       const btn = document.createElement('div');
