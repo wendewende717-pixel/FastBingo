@@ -3,396 +3,326 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Fast Bingo Mini App</title>
+  <title>Beteseb Style Fast Bingo</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+      background: radial-gradient(circle at top, #1e1b4b 0%, #090514 100%);
       color: #ffffff;
-      min-height: 100vh;
+      height: 100vh;
       width: 100vw;
-      overflow-x: hidden;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
 
-    /* 1. Splash Screen */
-    #splash-screen {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle, #1e1b4b 0%, #090514 100%);
-      z-index: 1000;
+    /* 1. Header Navigation */
+    .header-bar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      padding: 8px 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      align-items: center;
+    }
+
+    .btn-hdr {
+      background: #334155;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .stat-box {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 4px 8px;
+      text-align: center;
+      min-width: 65px;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      display: block;
+    }
+
+    .stat-value {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .timer-box {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid #f59e0b;
+      border-radius: 6px;
+      padding: 4px 10px;
+      text-align: center;
+    }
+
+    .timer-value {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #facc15;
+    }
+
+    /* 2. Controls Toolbar */
+    .action-bar {
+      display: flex;
+      gap: 8px;
+      padding: 6px 10px;
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #fff;
+      cursor: pointer;
+    }
+    .btn-auto { background: #0284c7; }
+    .btn-clear { background: #ea580c; }
+
+    /* 3. Main Fullscreen Grid Area */
+    .grid-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      align-content: start;
+    }
+
+    .cartela-btn {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .cartela-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Colors */
+    .cartela-btn.available {
+      background: #16a34a; /* 🟢 አረንጓዴ (ክፍት ቁጥር) */
+      border: 1px solid #4ade80;
+    }
+
+    .cartela-btn.selected {
+      background: #2563eb; /* 🔵 ደማቅ ሰማያዊ (እኔ የያዝኩት ቁጥር) */
+      border: 2px solid #93c5fd;
+      box-shadow: 0 0 8px #3b82f6;
+    }
+
+    .cartela-btn.taken {
+      background: #dc2626; /* 🔴 ቀይ (በሌላ ሰው የተያዘ/የተቆለፈ) */
+      border: 1px solid #fca5a5;
+      opacity: 0.8;
+      cursor: not-allowed;
+    }
+
+    /* 4. Bottom Tab Bar */
+    .bottom-nav {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: #0f172a;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 0;
+    }
+
+    .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.5s ease, visibility 0.5s;
-    }
-
-    .splash-logo {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 4px solid #f59e0b;
-      box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
-      margin-bottom: 30px;
-      animation: pulse 2s infinite alternate;
-      object-fit: cover;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      100% { transform: scale(1.06); }
-    }
-
-    .play-btn-main {
-      background: linear-gradient(135deg, #ef4444, #f97316, #eab308);
-      color: #fff;
-      font-size: 1.8rem;
-      font-weight: 900;
-      padding: 16px 50px;
-      border: none;
-      border-radius: 50px;
-      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.5);
+      color: #64748b;
+      font-size: 0.7rem;
+      gap: 2px;
       cursor: pointer;
-      letter-spacing: 1.5px;
     }
 
-    /* 2. Room Selection View */
-    #room-selection-screen {
-      display: none;
-      flex-direction: column;
-      min-height: 100vh;
-      padding: 16px;
-      background: #0b1120;
-    }
-
-    .screen-header {
-      text-align: center;
-      margin: 15px 0;
-    }
-
-    .screen-title {
-      font-size: 1.4rem;
-      font-weight: 900;
-      color: #facc15;
-    }
-
-    .screen-subtitle {
-      font-size: 0.85rem;
-      color: #94a3b8;
-      margin-top: 4px;
-    }
-
-    .rooms-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-top: 10px;
-      padding-bottom: 20px;
-    }
-
-    .room-card {
-      background: linear-gradient(145deg, #1e293b, #0f172a);
-      border: 2px solid #334155;
-      border-radius: 16px;
-      padding: 20px 10px;
-      text-align: center;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      transition: all 0.2s;
-    }
-
-    .room-card:active {
-      transform: scale(0.96);
-      border-color: #f59e0b;
-    }
-
-    .room-card.vip {
-      grid-column: span 2;
-      background: linear-gradient(135deg, #7c3aed, #4c1d95);
-      border: 2px solid #c084fc;
-      box-shadow: 0 0 15px rgba(192, 132, 252, 0.4);
-    }
-
-    .room-amount {
-      font-size: 1.5rem;
-      font-weight: 900;
+    .nav-item.active {
       color: #38bdf8;
     }
 
-    .room-card.vip .room-amount {
-      color: #fef08a;
-    }
-
-    .room-label {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      margin-top: 4px;
-      font-weight: 600;
-    }
-
-    .room-card.vip .room-label {
-      color: #e9d5ff;
-    }
-
-    /* 3. Main Game View (Cartela Selection) */
-    #game-screen {
-      display: none;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    .app-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: rgba(17, 24, 39, 0.95);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-img {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      border: 2px solid #f59e0b;
-      object-fit: cover;
-    }
-
-    .brand-name {
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: #facc15;
-    }
-
-    .dashboard {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      padding: 12px 16px;
-    }
-
-    .dash-box {
-      background: rgba(30, 41, 59, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 8px;
-      text-align: center;
-    }
-
-    .dash-title { font-size: 0.7rem; color: #94a3b8; }
-    .dash-value { font-size: 0.95rem; font-weight: 800; color: #38bdf8; margin-top: 2px; }
-
-    .controls {
-      display: flex;
-      gap: 8px;
-      padding: 0 16px 12px 16px;
-    }
-
-    .ctrl-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: white;
-      cursor: pointer;
-    }
-    .btn-auto { background: #0284c7; }
-    .btn-share { background: #7c3aed; }
-    .btn-reset { background: #ea580c; }
-
-    .grid-title {
-      text-align: center;
-      color: #facc15;
-      font-size: 1rem;
-      font-weight: 800;
-      margin: 8px 0;
-    }
-
-    .cartela-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      padding: 0 16px 20px 16px;
-    }
-
-    .cartela-item {
-      background: linear-gradient(145deg, #059669, #047857);
-      border: 2px solid #34d399;
-      border-radius: 16px;
-      padding: 16px 8px;
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: 900;
-      color: #ffffff;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-      cursor: pointer;
-    }
-
-    .cartela-item.selected {
-      background: linear-gradient(145deg, #dc2626, #b91c1c);
-      border-color: #fca5a5;
-      box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
-    }
-
-    .back-btn {
-      background: #334155;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
+    .nav-icon {
+      font-size: 1.1rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- 1. Splash Screen -->
-  <div id="splash-screen">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Fast Bingo Logo" class="splash-logo">
-    <button class="play-btn-main" onclick="goToRooms()">ተጫወት (PLAY)</button>
-  </div>
-
-  <!-- 2. Room Selection Screen -->
-  <div id="room-selection-screen">
-    <div class="screen-header">
-      <div class="screen-title">የመጫወቻ ክፍል ይምረጡ</div>
-      <div class="screen-subtitle">ለመጫወት የሚፈልጉትን የብር መጠን ይጫኑ</div>
+  <!-- Header -->
+  <div class="header-bar">
+    <button class="btn-hdr" onclick="history.back()">← Back</button>
+    <div class="stats-container">
+      <div class="stat-box">
+        <span class="stat-label">Main Wallet</span>
+        <span class="stat-value">0 ETB</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Play Wallet</span>
+        <span class="stat-value">0 ETB</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Stake</span>
+        <span class="stat-value">10 ETB</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">የያዝኩት</span>
+        <span class="stat-value" id="countDisplay">0/6</span>
+      </div>
     </div>
-
-    <div class="rooms-grid">
-      <div class="room-card" onclick="selectRoom('5 ETB')">
-        <div class="room-amount">5 ETB</div>
-        <div class="room-label">መደበኛ ክፍል</div>
-      </div>
-      <div class="room-card" onclick="selectRoom('10 ETB')">
-        <div class="room-amount">10 ETB</div>
-        <div class="room-label">መደበኛ ክፍል</div>
-      </div>
-      <div class="room-card" onclick="selectRoom('15 ETB')">
-        <div class="room-amount">15 ETB</div>
-        <div class="room-label">መደበኛ ክፍል</div>
-      </div>
-      <div class="room-card" onclick="selectRoom('20 ETB')">
-        <div class="room-amount">20 ETB</div>
-        <div class="room-label">መደበኛ ክፍል</div>
-      </div>
-      <div class="room-card" onclick="selectRoom('25 ETB')">
-        <div class="room-amount">25 ETB</div>
-        <div class="room-label">መደበኛ ክፍል</div>
-      </div>
-      <div class="room-card" onclick="selectRoom('50 ETB')">
-        <div class="room-amount">50 ETB</div>
-        <div class="room-label">መደበኛ ክፍል</div>
-      </div>
-      <div class="room-card" onclick="selectRoom('100 ETB')">
-        <div class="room-amount">100 ETB</div>
-        <div class="room-label">ከፍተኛ ክፍል</div>
-      </div>
-      <div class="room-card" onclick="selectRoom('200 ETB')">
-        <div class="room-amount">200 ETB</div>
-        <div class="room-label">ከፍተኛ ክፍል</div>
-      </div>
-      
-      <!-- VIP Room Option -->
-      <div class="room-card vip" onclick="selectRoom('VIP Room')">
-        <div class="room-amount">👑 VIP ROOM</div>
-        <div class="room-label">ልዩ የመጫወቻ ህግ ያለው ክፍል</div>
-      </div>
+    <div class="timer-box">
+      <span class="timer-value">40 s</span>
     </div>
   </div>
 
-  <!-- 3. Main Cartela Game Screen -->
-  <div id="game-screen">
-    <div class="app-header">
-      <div class="brand">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" class="brand-img" alt="Logo">
-        <span class="brand-name">FAST BINGO</span>
-      </div>
-      <button class="back-btn" onclick="backToRooms()">⬅ ክፍል ቀይር</button>
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <button class="btn-action btn-auto" onclick="autoSelectCard()">🎲 አውቶማቲክ (1 በ 1)</button>
+    <button class="btn-action btn-clear" onclick="clearMySelections()">📋 ዜሮ አድርግ</button>
+  </div>
+
+  <!-- Fullscreen Grid (#1 to #600) -->
+  <div class="grid-container" id="cartelaGrid">
+    <!-- JS dynamic rendering -->
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <span class="nav-icon">🎮</span>
+      <span>Game</span>
     </div>
-
-    <div class="dashboard">
-      <div class="dash-box">
-        <div class="dash-title">WALLET</div>
-        <div class="dash-value">0.00 ETB</div>
-      </div>
-      <div class="dash-box">
-        <div class="dash-title">ክፍል</div>
-        <div class="dash-value" id="selectedRoomDisplay">5 ETB</div>
-      </div>
-      <div class="dash-box">
-        <div class="dash-title">ካርቴል</div>
-        <div class="dash-value">0/6</div>
-      </div>
+    <div class="nav-item">
+      <span class="nav-icon">🕒</span>
+      <span>History</span>
     </div>
-
-    <div class="controls">
-      <button class="ctrl-btn btn-auto">🎲 አውቶማቲክ</button>
-      <button class="ctrl-btn btn-share">🕹 ሼር</button>
-      <button class="ctrl-btn btn-reset">📋 ዢሮ</button>
+    <div class="nav-item">
+      <span class="nav-icon">👛</span>
+      <span>Wallet</span>
     </div>
-
-    <div class="grid-title">🎰 ከ 600 ካርቴሎች መርጠው ይጫወቱ</div>
-
-    <div class="cartela-grid" id="grid">
-      <!-- Cartelas -->
+    <div class="nav-item">
+      <span class="nav-icon">👤</span>
+      <span>Profile</span>
     </div>
   </div>
 
   <script>
+    // Initialize Telegram WebApp
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
     }
 
-    function goToRooms() {
-      document.getElementById('splash-screen').style.display = 'none';
-      document.getElementById('room-selection-screen').style.display = 'flex';
+    const MAX_LIMIT = 6;
+    let selectedCards = JSON.parse(localStorage.getItem('my_selected_cards')) || [];
+    
+    // Sample locked numbers taken by other users
+    const takenCards = [4, 5, 6, 12, 18, 25, 33, 40, 55, 88, 102, 210, 305, 450, 599];
+
+    const gridContainer = document.getElementById('cartelaGrid');
+    const countDisplay = document.getElementById('countDisplay');
+
+    function updateCountDisplay() {
+      countDisplay.innerText = `${selectedCards.length}/${MAX_LIMIT}`;
+      localStorage.setItem('my_selected_cards', JSON.stringify(selectedCards));
     }
 
-    function selectRoom(roomName) {
-      document.getElementById('selectedRoomDisplay').innerText = roomName;
-      document.getElementById('room-selection-screen').style.display = 'none';
-      document.getElementById('game-screen').style.display = 'flex';
+    function renderGrid() {
+      gridContainer.innerHTML = '';
+      for (let i = 1; i <= 600; i++) {
+        const btn = document.createElement('div');
+        btn.innerText = i;
+        
+        if (takenCards.includes(i)) {
+          btn.className = 'cartela-btn taken';
+        } else if (selectedCards.includes(i)) {
+          btn.className = 'cartela-btn selected';
+          btn.onclick = () => toggleSelect(i);
+        } else {
+          btn.className = 'cartela-btn available';
+          btn.onclick = () => toggleSelect(i);
+        }
+
+        gridContainer.appendChild(btn);
+      }
+      updateCountDisplay();
     }
 
-    function backToRooms() {
-      document.getElementById('game-screen').style.display = 'none';
-      document.getElementById('room-selection-screen').style.display = 'flex';
+    function toggleSelect(num) {
+      const index = selectedCards.indexOf(num);
+      if (index > -1) {
+        selectedCards.splice(index, 1);
+      } else {
+        if (selectedCards.length >= MAX_LIMIT) {
+          alert("ከ 6 ካርቴላ በላይ መያዝ አይቻልም!");
+          return;
+        }
+        selectedCards.push(num);
+      }
+      renderGrid();
     }
 
-    const gridContainer = document.getElementById('grid');
-    for (let i = 1; i <= 30; i++) {
-      const btn = document.createElement('div');
-      btn.className = 'cartela-item';
-      btn.innerText = `#${i}`;
-      btn.onclick = function() {
-        this.classList.toggle('selected');
-      };
-      gridContainer.appendChild(btn);
+    function autoSelectCard() {
+      if (selectedCards.length >= MAX_LIMIT) {
+        alert("ከ 6 ካርቴላ በላይ መያዝ አይቻልም!");
+        return;
+      }
+      
+      let randomNum;
+      do {
+        randomNum = Math.floor(Math.random() * 600) + 1;
+      } while (takenCards.includes(randomNum) || selectedCards.includes(randomNum));
+
+      selectedCards.push(randomNum);
+      renderGrid();
     }
+
+    function clearMySelections() {
+      selectedCards = [];
+      renderGrid();
+    }
+
+    // Initial Render
+    renderGrid();
   </script>
 </body>
 </html>
