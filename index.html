@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Beteseb Style Fast Bingo</title>
+  <title>Fast Bingo Bot</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * {
@@ -23,13 +23,81 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
 
-    /* 1. Header Navigation */
+    /* Top Banner Notification */
+    .toast-msg {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      z-index: 100;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    /* Red Warning Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .modal-box {
+      background: #1e1b4b;
+      border: 2px solid #ef4444;
+      border-radius: 12px;
+      padding: 20px;
+      width: 80%;
+      max-width: 300px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .modal-text {
+      color: #ef4444; /* 🔴 የማስጠንቀቂያ ጽሑፉ በቀይ ቀለም */
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .modal-btn {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Header Bar */
     .header-bar {
       display: grid;
       grid-template-columns: auto 1fr auto;
-      gap: 8px;
+      gap: 6px;
       padding: 8px 10px;
       background: rgba(15, 23, 42, 0.9);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -40,16 +108,16 @@
       background: #334155;
       color: #fff;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
     }
 
     .stats-container {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       justify-content: center;
     }
 
@@ -57,19 +125,19 @@
       background: rgba(30, 41, 59, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 6px;
-      padding: 4px 8px;
+      padding: 4px 6px;
       text-align: center;
-      min-width: 65px;
+      min-width: 55px;
     }
 
     .stat-label {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       color: #94a3b8;
       display: block;
     }
 
     .stat-value {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: #38bdf8;
     }
@@ -78,17 +146,17 @@
       background: rgba(245, 158, 11, 0.15);
       border: 1px solid #f59e0b;
       border-radius: 6px;
-      padding: 4px 10px;
+      padding: 4px 8px;
       text-align: center;
     }
 
     .timer-value {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 800;
       color: #facc15;
     }
 
-    /* 2. Controls Toolbar */
+    /* Action Bar */
     .action-bar {
       display: flex;
       gap: 8px;
@@ -109,7 +177,7 @@
     .btn-auto { background: #0284c7; }
     .btn-clear { background: #ea580c; }
 
-    /* 3. Main Fullscreen Grid Area */
+    /* Grid Area */
     .grid-container {
       flex: 1;
       overflow-y: auto;
@@ -126,38 +194,32 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 800;
       color: #ffffff;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       cursor: pointer;
-      transition: transform 0.1s ease;
     }
 
-    .cartela-btn:active {
-      transform: scale(0.92);
-    }
-
-    /* Colors */
     .cartela-btn.available {
-      background: #16a34a; /* 🟢 አረንጓዴ (ክፍት ቁጥር) */
+      background: #16a34a;
       border: 1px solid #4ade80;
     }
 
     .cartela-btn.selected {
-      background: #2563eb; /* 🔵 ደማቅ ሰማያዊ (እኔ የያዝኩት ቁጥር) */
+      background: #2563eb;
       border: 2px solid #93c5fd;
       box-shadow: 0 0 8px #3b82f6;
     }
 
     .cartela-btn.taken {
-      background: #dc2626; /* 🔴 ቀይ (በሌላ ሰው የተያዘ/የተቆለፈ) */
+      background: #dc2626;
       border: 1px solid #fca5a5;
-      opacity: 0.8;
+      opacity: 0.85;
       cursor: not-allowed;
     }
 
-    /* 4. Bottom Tab Bar */
+    /* Bottom Nav */
     .bottom-nav {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -174,7 +236,6 @@
       color: #64748b;
       font-size: 0.7rem;
       gap: 2px;
-      cursor: pointer;
     }
 
     .nav-item.active {
@@ -182,13 +243,25 @@
     }
 
     .nav-icon {
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- Toast Notification -->
+  <div class="toast-msg" id="toastMsg"></div>
+
+  <!-- Red Alert Modal -->
+  <div class="modal-overlay" id="alertModal">
+    <div class="modal-box">
+      <div class="modal-title">Fast Bingo Bot</div>
+      <div class="modal-text">ከ 6 ካርቴላ በላይ መያዝ አይቻልም!</div>
+      <button class="modal-btn" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+
+  <!-- Header Bar -->
   <div class="header-bar">
     <button class="btn-hdr" onclick="history.back()">← Back</button>
     <div class="stats-container">
@@ -214,18 +287,16 @@
     </div>
   </div>
 
-  <!-- Action Bar -->
+  <!-- Controls -->
   <div class="action-bar">
     <button class="btn-action btn-auto" onclick="autoSelectCard()">🎲 አውቶማቲክ (1 በ 1)</button>
-    <button class="btn-action btn-clear" onclick="clearMySelections()">📋 ዜሮ አድርግ</button>
+    <button class="btn-action btn-clear" onclick="clearMySelections()">📋 ኬር አድርግ</button>
   </div>
 
-  <!-- Fullscreen Grid (#1 to #600) -->
-  <div class="grid-container" id="cartelaGrid">
-    <!-- JS dynamic rendering -->
-  </div>
+  <!-- Grid Area -->
+  <div class="grid-container" id="cartelaGrid"></div>
 
-  <!-- Bottom Navigation -->
+  <!-- Bottom Nav -->
   <div class="bottom-nav">
     <div class="nav-item active">
       <span class="nav-icon">🎮</span>
@@ -246,24 +317,49 @@
   </div>
 
   <script>
-    // Initialize Telegram WebApp
-    if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.ready();
-      window.Telegram.WebApp.expand();
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
     }
 
     const MAX_LIMIT = 6;
     let selectedCards = JSON.parse(localStorage.getItem('my_selected_cards')) || [];
-    
-    // Sample locked numbers taken by other users
-    const takenCards = [4, 5, 6, 12, 18, 25, 33, 40, 55, 88, 102, 210, 305, 450, 599];
+    const takenCards = [4, 5, 6, 12, 18, 25, 33, 40, 55, 88];
 
     const gridContainer = document.getElementById('cartelaGrid');
     const countDisplay = document.getElementById('countDisplay');
+    const toastMsg = document.getElementById('toastMsg');
+    const alertModal = document.getElementById('alertModal');
 
     function updateCountDisplay() {
       countDisplay.innerText = `${selectedCards.length}/${MAX_LIMIT}`;
       localStorage.setItem('my_selected_cards', JSON.stringify(selectedCards));
+    }
+
+    function showToast(text) {
+      toastMsg.innerText = text;
+      toastMsg.style.display = 'block';
+      setTimeout(() => {
+        toastMsg.style.display = 'none';
+      }, 2000);
+    }
+
+    function triggerWarning() {
+      // 1. Vibration
+      if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100]);
+      }
+      if (tg && tg.HapticFeedback) {
+        tg.HapticFeedback.notificationOccurred('error');
+      }
+
+      // 2. Red Warning Modal Show
+      alertModal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      alertModal.style.display = 'none';
     }
 
     function renderGrid() {
@@ -293,7 +389,7 @@
         selectedCards.splice(index, 1);
       } else {
         if (selectedCards.length >= MAX_LIMIT) {
-          alert("ከ 6 ካርቴላ በላይ መያዝ አይቻልም!");
+          triggerWarning();
           return;
         }
         selectedCards.push(num);
@@ -303,7 +399,7 @@
 
     function autoSelectCard() {
       if (selectedCards.length >= MAX_LIMIT) {
-        alert("ከ 6 ካርቴላ በላይ መያዝ አይቻልም!");
+        triggerWarning();
         return;
       }
       
@@ -314,6 +410,7 @@
 
       selectedCards.push(randomNum);
       renderGrid();
+      showToast(`ካርቴላ #${randomNum} ተመርጧል!`);
     }
 
     function clearMySelections() {
@@ -321,7 +418,6 @@
       renderGrid();
     }
 
-    // Initial Render
     renderGrid();
   </script>
 </body>
