@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>የመጫወቻ ክፍል ይምረጡ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body { font-family: sans-serif; background-color: #0b0f19; color: #fff; margin: 0; padding: 16px; text-align: center; }
+.header { font-size: 20px; font-weight: bold; margin-bottom: 5px; color: #fde047; }
+.sub-header { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
+.rooms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+.room-card { background: #161f30; border: 1px solid #233248; border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; }
+.price-title { font-size: 22px; font-weight: bold; color: #38bdf8; }
+.room-type { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+.vip-card { background: linear-gradient(135deg, #581c87, #3b0764); border: 1px solid #a855f7; border-radius: 12px; padding: 18px; margin-top: 10px; cursor: pointer; }
+.vip-title { font-size: 22px; font-weight: bold; color: #fde047; }
+</style>
+</head>
+<body>
+<div class="header">የመጫወቻ ክፍል ይምረጡ</div>
+<div class="sub-header">ለመጫወት የሚፈልጉትን የብር መጠን ይጫኑ</div>
+
+<div class="rooms-grid">
+  <div class="room-card" onclick="enterRoom(5

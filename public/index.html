@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fast Bingo</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body { font-family: sans-serif; background-color: #0b0f19; color: #fff; margin: 0; padding: 16px; text-align: center; }
+.user-card { background: #161f30; padding: 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.balance { background: #0088cc; padding: 6px 12px; border-radius: 20px; font-weight: bold; }
+.main-btn { background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; color: white; padding: 18px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.sub-btn { background: #1e293b; border: 1px solid #334155; color: white; padding: 14px; border-radius: 12px; font-size: 14px; }
+.jackpot { background: linear-gradient(135deg, #b45309, #78350f); padding: 15px; border-radius: 12px; }
+</style>
+</head>
+<body>
+<div class="user-card">
+<div id="uname">ተጫዋች: <b>...</b></div>
+<div class="balance">100 ETB</div>
+</div>
+<button class="main-btn">🎮 ቢንጎ ጨዋታ ጀምር</button>
+<div class="grid">
+<button class="sub-btn">🎡 ዕድለኛ Spin</button>
+<button class="sub-btn">🏆 Top 10 & ሪሰ</button>
+</div>
+<div class="jackpot">🔥 የዛሬው የጋራ ጃክፖት<h2 style="margin:5px 0; color:#fde047;">25,000 ETB</h2></div>
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+document.getElementById("uname").innerHTML = "ተጫዋች: <b>" + tg.initDataUnsafe.user.first_name + "</b>";
+}
+</script>
+</body>
+</html>

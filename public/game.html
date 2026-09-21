@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fast Bingo Game</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body { font-family: sans-serif; background-color: #0b0f19; color: #fff; margin: 0; padding: 12px; text-align: center; }
+.header { display: flex; justify-content: space-between; align-items: center; background: #161f30; padding: 10px 15px; border-radius: 10px; margin-bottom: 15px; }
+.room-badge { background: #2563eb; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 13px; }
+.drawn-ball { background: linear-gradient(135deg, #f59e0b, #d97706); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin: 0 auto 15px auto; box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+.board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #161f30; padding: 10px; border-radius: 12px; margin-bottom: 15px; }
+.cell { background: #1e293b; border: 1px solid #334155; padding: 12px 0; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; }
+.cell.selected { background: #22c55e; border-color: #16a34a; color: #fff; }
+.bingo-btn { background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: white; width: 100%; padding: 16px; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="room-badge" id="room-name">5 ETB ROOM</div>
+  <div style="color: #38bdf8; font-size: 14px;">ተጫዋቾች: <b>12</b></div>
+</div>
+
+<div style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">የወጣው ቁጥር</div>
+<div class="drawn-ball" id="current-ball">--</div>
+
+<div class="board" id="bingo-board"></div>
+
+<button class="bingo-btn" onclick="checkBingo()">🎉 BINGO!</button>
+
+<script>
+const board = document.getElementById("bingo-board");
+for (let i = 1; i <= 25; i++) {
+  let cell = document.createElement("div");
+  cell.className = "cell";
+  cell.innerText = Math.floor(Math.random() * 75) + 1;
+  cell.onclick = function() { this.classList.toggle("selected"); };
+  board.appendChild(cell);
+}
+function checkBingo() {
+  alert("ቢንጎ ብለዋል! ሰርቨሩ እየጣራ ነው...");
+}
+</script>
+</body>
+</html>
