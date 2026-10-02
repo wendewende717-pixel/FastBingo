@@ -11,7 +11,6 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# ከተጠቃሚዎች መረጃ ጊዜያዊ ማከማቻ (In-Memory Database)
 USER_DATABASE = {}
 
 class CustomWebAppHandler(SimpleHTTPRequestHandler):
@@ -33,21 +32,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     first_name = update.effective_user.first_name
 
-    # ተጠቃሚው ቀድሞ ካልተመዘገበ ስልኩን እንዲያጋራ መጠየቅ
     if user_id not in USER_DATABASE:
         contact_keyboard = ReplyKeyboardMarkup(
-            [[KeyboardButton("📲 Share Contact (ስልክ ቁጥር አጋራ)", request_contact=True)]],
+            [[KeyboardButton("📲 ስልክ ቁጥር አጋራ (Share Contact)", request_contact=True)]],
             resize_keyboard=True,
             one_time_keyboard=True
         )
         msg = (
             f"ሰላም {first_name}! 👋\n\n"
             f"እንኳን ወደ **Fast Bingo NextGen Pro** በደህና መጡ! 🎲\n\n"
-            f"ጨዋታውን ለመጀመርና የራሶትን ልዩ **Account ID** ለማግኘት እባክዎ ከታች ያለውን **'📲 Share Contact'** አዝራር ይጫኑ።"
+            f"የራሶትን የሂሳብ መለያ (**Account ID**) ለማግኘትና ጨዋታውን ለመጀመር እባክዎ ከታች ያለውን **'📲 ስልክ ቁጥር አጋራ'** የሚለውን አዝራር ይጫኑ።\n\n"
+            f"*(ማሳሰቢያ፦ የቴሌግራም ማስጠንቀቂያ ቢመጣ 'Share contact' የሚለውን በመጫን ይቀጥሉ)*"
         )
         await update.message.reply_text(msg, reply_markup=contact_keyboard, parse_mode="Markdown")
     else:
-        # ከተመዘገበ ዋናውን Dashboard ማሳየት
         await show_main_menu(update, user_id)
 
 async def contact_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -55,7 +53,6 @@ async def contact_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     first_name = update.effective_user.first_name
     phone_number = update.message.contact.phone_number
 
-    # ለተጠቃሚው ልዩ Account ID ማመንጨት (ለምሳሌ FB-7842)
     custom_id = f"FB-{random.randint(1000, 9999)}"
     USER_DATABASE[user_id] = {
         "name": first_name,
@@ -64,30 +61,30 @@ async def contact_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "balance": 0.0
     }
 
-    success_msg = f"🎉 **ምዝገባው ተሳክቷል!**\n\n👤 ስም: {first_name}\n🆔 Account ID: `{custom_id}`\n📱 ስልክ: {phone_number}"
+    success_msg = f"🎉 **ምዝገባዎ በስኬት ተጠናቋል!**\n\n👤 **ስም:** {first_name}\n🆔 **የመለያ ቁጥር (ID):** `{custom_id}`\n📱 **ስልክ:** {phone_number}"
     await update.message.reply_text(success_msg, parse_mode="Markdown")
     
-    # ወደ ዋናው ሜኑ መውሰድ
     await show_main_menu(update, user_id)
 
 async def show_main_menu(update: Update, user_id: int):
     user_data = USER_DATABASE.get(user_id, {"account_id": f"FB-{user_id}", "balance": 0.0})
     web_app_url = "https://my-fastbingo-app.onrender.com"
 
+    # ሙሉ በሙሉ በአማርኛ የተዘጋጁ አዝራሮች
     keyboard = [
-        [InlineKeyboardButton("🎮 Play Bingo (ተጫወት)", web_app=WebAppInfo(url=web_app_url)), InlineKeyboardButton("📝 Register", callback_data="reg")],
-        [InlineKeyboardButton("💵 Check Balance", callback_data="bal"), InlineKeyboardButton("💳 Deposit", callback_data="dep")],
-        [InlineKeyboardButton("☎️ Contact Support", callback_data="sup"), InlineKeyboardButton("📖 Instruction", callback_data="inst")],
-        [InlineKeyboardButton("🎁 Transfer", callback_data="trans"), InlineKeyboardButton("🤑 Withdraw", callback_data="with")],
-        [InlineKeyboardButton("🔗 Invite Friends", callback_data="inv"), InlineKeyboardButton("🔄 Convert Bonus", callback_data="bon")]
+        [InlineKeyboardButton("🎮 ቢንጎ ተጫወት (Play)", web_app=WebAppInfo(url=web_app_url)), InlineKeyboardButton("📝 ምዝገባ", callback_data="reg")],
+        [InlineKeyboardButton("💵 ቀሪ ሂሳብ (Balance)", callback_data="bal"), InlineKeyboardButton("💳 ብር መሙያ (Deposit)", callback_data="dep")],
+        [InlineKeyboardButton("☎️ እገዛ (Support)", callback_data="sup"), InlineKeyboardButton("📖 መመሪያ (Instruction)", callback_data="inst")],
+        [InlineKeyboardButton("🎁 ብር ማስተላለፊያ", callback_data="trans"), InlineKeyboardButton("🤑 ብር ማውጫ (Withdraw)", callback_data="with")],
+        [InlineKeyboardButton("🔗 ጓደኛ ጋብዝ (Invite)", callback_data="inv"), InlineKeyboardButton("🔄 ቦነስ ቀይር", callback_data="bon")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     welcome_txt = (
-        f"👋 Welcome to **Fast Bingo**!\n"
-        f"🆔 **Your ID:** `{user_data['account_id']}`\n"
-        f"💰 **Balance:** {user_data['balance']} ETB\n\n"
-        f"Choose an Option below."
+        f"👋 እንኳን ወደ **Fast Bingo** በደህና መጡ!\n"
+        f"🆔 **የእርስዎ ID:** `{user_data['account_id']}`\n"
+        f"💰 **የአካውንትዎ ቀሪ ሂሳብ:** {user_data['balance']} ብር\n\n"
+        f"ከታች ካሉት አማራጮች አንዱን ይምረጡ፦"
     )
     await update.message.reply_text(welcome_txt, reply_markup=reply_markup, parse_mode="Markdown")
 
@@ -96,13 +93,13 @@ def main():
 
     TOKEN = os.environ.get("BOT_TOKEN")
     if not TOKEN or TOKEN == "YOUR_BOT_TOKEN_HERE":
-        TOKEN = "8156382103:AAH..." # <--- የቦትህን Token እዚህ ጋር ተካው
+        TOKEN = "8156382103:AAH..." # <--- የቦትህን Token እዚህ ጋር አስገባ
 
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.CONTACT, contact_handler))
 
-    print("Fast Bingo Bot with Registration is running...")
+    print("Fast Bingo Bot is running with Amharic UI...")
     app.run_polling()
 
 if __name__ == "__main__":
