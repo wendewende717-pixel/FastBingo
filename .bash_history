@@ -1,59 +1,3 @@
-        const tg = window.Telegram ? window.Telegram.WebApp : null;
-        if(tg) tg.expand();
-
-        let userData = { id: 7390194019, name: "Wende", balance: 100 };
-        if(tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            userData.id = tg.initDataUnsafe.user.id;
-            userData.name = tg.initDataUnsafe.user.first_name;
-        }
-
-        document.getElementById('uName').innerText = userData.name;
-        document.getElementById('uAvatar').innerText = userData.name.charAt(0);
-        document.getElementById('uId').innerText = "ID: " + userData.id;
-
-        let currentStake = 0;
-
-        function switchView(viewId) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
-            document.getElementById(viewId).classList.add('active-view');
-        }
-
-        function selectStake(amount) {
-            currentStake = amount;
-            document.getElementById('selStakeLbl').innerText = amount;
-            renderMatrix();
-            switchView('matrixView');
-        }
-
-        function renderMatrix() {
-            const container = document.getElementById('matrixContainer');
-            container.innerHTML = "";
-            for(let i = 1; i <= 600; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'matrix-cell';
-                cell.innerText = i;
-                
-                if(i % 9 === 0) {
-                    cell.classList.add('taken');
-                    cell.onclick = () => alert(`ካርቴላ #${i} በሌላ ተጫዋች ተይዟል!`);
-                } else {
-                    cell.onclick = () => buyCard(i);
-                }
-                container.appendChild(cell);
-            }
-        }
-
-        function buyCard(cardNum) {
-            if(confirm(`ካርቴላ #${cardNum} በ ${currentStake} ETB መግዛት ይፈልጋሉ?`)) {
-                alert(`🎉 ካርቴላ #${cardNum} በስኬት ገዝተዋል!`);
-                switchView('homeView');
-            }
-        }
-    </script>
-</body>
-</html>
-EOF
-
 cat << 'EOF' > main.py
 import sqlite3
 import random
@@ -498,3 +442,59 @@ EOF
 # 5. ቦቱን ማስነሳት
 python main.py
 cloudflared tunnel --url http://localhost:8000
+cd fast-bingo
+python main.py
+cd fast-bingo
+git add .
+git commit -m "Update WebApp UI"
+git push
+pkg update && pkg install git -y
+ls
+cd fast-bingo
+git add .
+git commit -m "Update WebApp UI"
+git push
+termux-change-repo
+pkg update && pkg install git -y
+git add .
+git commit -m "Update WebApp UI"
+git push
+cd fast-bingo
+git add .
+git commit -m "Update WebApp UI"
+git push
+ls -a
+git init
+git add .
+git commit -m "Update Fast Bingo WebApp UI"
+git push
+git config --global user.email "wende4366@gmail.com"
+git config --global user.name "wende"
+git remote add origin https://github.com/wende4366/fast-bingo.git
+git add .
+git commit -m "Update Fast Bingo WebApp UI"
+git push -u origin main
+git branch -M main
+git push -u origin main
+git remote set-url origin https://github.com/wendewende717-pixel/fast-bingo.git
+git push -u origin main
+git remote set-url origin https://github.com/wendewende717-pixel/FastBingo.git
+git push -u origin main --force
+cd FastBingo
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+keyboard = [[
+]]
+reply_markup = InlineKeyboardMarkup(keyboard)
+git add .
+git commit -m "Update Telegram WebApp URL"
+git push origin main
+cd FastBingo
+nano main.py
+git add .
+git commit -m "Update main.py with fixed WebApp URL"
+git push origin main
+cd FastBingo
+nano main.py
+git add .
+git commit -m "Update main.py with live Render URL"
+git push origin main
