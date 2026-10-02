@@ -1,74 +1,60 @@
-import re
+import os
 import logging
-import http.server
-import socketserver
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
-import database
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-logging.basicConfig(level=logging.INFO)
+# Logging setup
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
-# ዳታቤዙን ሰርቨሩ ሲነሳ ማስጀመር
-database.init_db()
+# 1. Static WebApp Server Setup (Serves static/index.html)
+class WebAppHandler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory="static", **kwargs)
 
-TOKEN = "8234368672:AAHaTtqt08OpQQmrDDjknqtdhH66FeF5Oss"
-PORT = 8000
+def run_http_server():
+    port = int(os.environ.get("PORT", 8000))
+    server = HTTPServer(('0.0.0.0', port), WebAppHandler)
+    print(f"Serving WebApp on port {port}...")
+    server.serve_forever()
 
-def get_url():
-    try:
-        with open("tunnel.log", "r") as f:
-            urls = re.findall(r'https://[a-zA-Z0-9-]+\.trycloudflare\.com', f.read())
-            if urls:
-                return urls[-1]
-    except Exception:
-        pass
-    return ""
-
-class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/' or self.path == '/index.html':
-            self.path = '/static/index.html'
-        return http.server.SimpleHTTPRequestHandler.do_GET(self)
-
-def run_web_server():
-    with socketserver.TCPServer(("", PORT), CustomHTTPRequestHandler) as httpd:
-        httpd.serve_forever()
-
+# 2. Telegram Bot Command Handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    
-    # ተጫዋቹን ዳታቤዝ ውስጥ መመዝገብ / ማረጋገጥ
-    db_user = database.get_or_create_user(
-        telegram_id=user.id,
-        username=user.username or "",
-        first_name=user.first_name or ""
-    )
-    
-    current_url = get_url()
+    # Live Render WebApp Link
+    web_app_url = "https://fastbingo.onrender.com"
     
     keyboard = [
-        [
-            InlineKeyboardButton("🎮 Play Fast Bingo (Web App)", web_app=WebAppInfo(url=current_url))
-        ]
+        [InlineKeyboardButton("🎮 ቢንጎ ጨዋታ ጀምር", web_app=WebAppInfo(url=web_app_url))]
     ]
-    
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(
-        f"👋 **ሰላም {user.first_name}!**\n\n"
-        f"ወደ **Fast Bingo NextGen Pro** እንኳን በደህና መጡ! 🎯\n"
-        f"💳 ያሎት ቀሪ ሂሳብ: **{db_user['balance']} ETB**\n\n"
-        "ታች ያለውን **'Play Fast Bingo'** የሚለውን አዝራር በመጫን ይጫወቱ።",
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
+    
+    user_first_name = update.effective_user.first_name
+    welcome_msg = (
+        f"ሰላም {user_first_name}! 👋\n\n"
+        f"እንኳን ወደ **Fast Bingo NextGen Pro** በደህና መጡ! 🎲\n"
+        f"ከታች ያለውን አዝራር ተጭነው ጨዋታውን ይጀምሩ።"
     )
+    
+    await update.message.reply_text(welcome_msg, reply_markup=reply_markup, parse_mode="Markdown")
 
+# 3. Main Application Entry Point
 def main():
-    threading.Thread(target=run_web_server, daemon=True).start()
-    app = Application.builder().token(TOKEN).build()
+    # Start HTTP Static WebApp Server in a background thread
+    threading.Thread(target=run_http_server, daemon=True).start()
+
+    # Telegram Bot Token (Render Environment Variable or Direct Token)
+    TOKEN = os.environ.get("BOT_TOKEN", "7832693998:AAElL55C1m_YOUR_BOT_TOKEN_HERE")
+
+    # Build and run python-telegram-bot
+    app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    print("🚀 Fast Bingo Bot ከዳታቤዝ ጋር ተያይዞ በስኬት ተነስቷል!")
+
+    print("Fast Bingo Bot is running...")
     app.run_polling()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
