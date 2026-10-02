@@ -10,13 +10,11 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# Render ላይ static/index.html ፋይልን በትክክል ለማግኘት የተስተካከለ Handler
 class CustomWebAppHandler(SimpleHTTPRequestHandler):
     def init(self, *args, **kwargs):
         super().init(*args, directory="static", **kwargs)
 
     def do_GET(self):
-        # ማንኛውም ጥያቄ ሲመጣ static/index.html እንዲከፍት ማድርግ
         if self.path == '/' or self.path == '':
             self.path = '/index.html'
         return super().do_GET()
