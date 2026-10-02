@@ -49,29 +49,29 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_main_menu(update, user_id)
 
 async def contact_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    first_name = update.effective_user.first_name
-    phone_number = update.message.contact.phone_number
+    try:
+        user_id = update.effective_user.id
+        first_name = update.effective_user.first_name
+        phone_number = update.message.contact.phone_number
 
-    custom_id = f"FB-{random.randint(1000, 9999)}"
-    USER_DATABASE[user_id] = {
-        "name": first_name,
-        "phone": phone_number,
-        "account_id": custom_id,
-        "balance": 0.0
-    }
+        custom_id = f"FB-{random.randint(1000, 9999)}"
+        USER_DATABASE[user_id] = {
+            "name": first_name,
+            "phone": phone_number,
+            "account_id": custom_id,
+            "balance": 0.0
+        }
 
-    success_msg = f"🎉 **ምዝገባዎ በስኬት ተጠናቋል!**\n\n👤 **ስም:** {first_name}\n🆔 **የመለያ ቁጥር (ID):** `{custom_id}`\n📱 **ስልክ:** {phone_number}"
-    await update.message.reply_text(success_msg, parse_mode="Markdown")
-    
-    await show_main_menu(update, user_id)
+        success_msg = f"🎉 **ምዝገባዎ በስኬት ተጠናቋል!**\n\n👤 **ስም:** {first_name}\n🆔 **የመለያ ቁጥር (ID):** `{custom_id}`\n📱 **ስልክ:** {phone_number}"
+        await update.message.reply_text(success_msg, parse_mode="Markdown")
+        
+        await show_main_menu(update, user_id)
+    except Exception as e:
+        logging.error(f"Error in contact handler: {e}")
 
 async def show_main_menu(update: Update, user_id: int):
     user_data = USER_DATABASE.get(user_id, {"account_id": f"FB-{user_id}", "balance": 0.0})
     web_app_url = "https://my-fastbingo-app.onrender.com"
-
-    # የቦቱ ባነር/ሎጎ ምስል URL
-    logo_url = "https://raw.githubusercontent.com/wendewende717-pixel/FastBingo/main/static/logo.jpg"
 
     keyboard = [
         [InlineKeyboardButton("🎮 ቢንጎ ተጫወት (Play)", web_app=WebAppInfo(url=web_app_url)), InlineKeyboardButton("📝 ምዝገባ", callback_data="reg")],
@@ -83,19 +83,17 @@ async def show_main_menu(update: Update, user_id: int):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     welcome_txt = (
-        f"👋 👋 እንኳን ወደ **Fast Bingo NextGen Pro** በደህና መጡ!\n\n"
+        f"👋 እንኳን ወደ **Fast Bingo NextGen Pro** በደህና መጡ!\n\n"
         f"🆔 **የእርስዎ ID:** `{user_data['account_id']}`\n"
         f"💰 **የአካውንትዎ ቀሪ ሂሳብ:** {user_data['balance']} ብር\n\n"
         f"ከታች ካሉት አማራጮች አንዱን ይምረጡ፦"
     )
 
-    try:
-        # ምስል ካለ በምስል ያወጣል፤ ካልሆነ ቀጥታ ፅሁፉን ይልካል
-        await update.message.reply_photo(photo=logo_url, caption=welcome_txt, reply_markup=reply_markup, parse_mode="Markdown")
-    except Exception:
+    if update.message:
         await update.message.reply_text(welcome_txt, reply_markup=reply_markup, parse_mode="Markdown")
+    elif update.callback_query:
+        await update.callback_query.message.reply_text(welcome_txt, reply_markup=reply_markup, parse_mode="Markdown")
 
-# አዝራሮቹ ሲነኩ የሚሰጡት ምላሽ (Button Callbacks)
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -111,7 +109,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "with":
         await query.message.reply_text("🤑 **ብር ማውጫ (Withdraw)**\n\nዝቅተኛ የማውጫ መጠን: **50 ብር**\nለማውጣት የሚፈልጉትን የብር መጠን ይጻፉ፦", parse_mode="Markdown")
     elif data == "sup":
-        await query.message.reply_text("☎️️ **የደንበኞች እገዛ (Support)**\n\nለማንኛውም ጥያቄ ወይም አቤቱታ በቴሌግራም ያውሩን፦ @wende4366", parse_mode="Markdown")
+        await query.message.reply_text("☎ **የደንበኞች እገዛ (Support)**\n\nለማንኛውም ጥያቄ ወይም አቤቱታ በቴሌግራም ያውሩን፦ @wende4366", parse_mode="Markdown")
     elif data == "inst":
         await query.message.reply_text("📖 **የጨዋታ መመሪያ (Instruction)**\n\n1. 'ቢንጎ ተጫወት' የሚለውን በመጫን ቦርዱን ይክፈቱ።\n2. ከ 1-600 ካርቴላዎች ውስጥ የሚፈልጉትን ይምረጡ።\n3. ቁጥሮች ሲጠሩ በራሱ ወይም በእጅዎ ይመልከቱ።\n4. ቀድመው ቢንጎ ሲሰሩ ያሸንፋሉ!", parse_mode="Markdown")
     elif data == "reg":
@@ -128,14 +126,14 @@ def main():
 
     TOKEN = os.environ.get("BOT_TOKEN")
     if not TOKEN or TOKEN == "YOUR_BOT_TOKEN_HERE":
-        TOKEN = "8156382103:AAH..." # <--- የቦትህ Token እዚህ ይግባ
+        TOKEN = "8156382103:AAH..." # <--- የቦትህ Token
 
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.CONTACT, contact_handler))
     app.add_handler(CallbackQueryHandler(button_callback))
 
-    print("Fast Bingo Bot with Interactive Buttons is running...")
+    print("Fast Bingo Bot running securely...")
     app.run_polling()
 
 if __name__ == "__main__":
