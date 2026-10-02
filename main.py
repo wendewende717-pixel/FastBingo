@@ -1,5 +1,6 @@
 import os
 import logging
+import asyncio
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
@@ -11,8 +12,8 @@ logging.basicConfig(
 )
 
 class CustomWebAppHandler(SimpleHTTPRequestHandler):
-    def init(self, *args, **kwargs):
-        super().init(*args, directory="static", **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory="static", **kwargs)
 
     def do_GET(self):
         if self.path == '/' or self.path == '':
@@ -26,26 +27,26 @@ def run_http_server():
     server.serve_forever()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    web_app_url = "https://fastbingo.onrender.com"
+    # ትክክለኛው የ Render አድራሻህ
+    web_app_url = "https://my-fastbingo-app.onrender.com"
     
     keyboard = [
         [InlineKeyboardButton("🎮 ቢንጎ ጨዋታ ጀምር", web_app=WebAppInfo(url=web_app_url))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    user_first_name = update.effective_user.first_name
-    welcome_msg = (
-        f"ሰላም {user_first_name}! 👋\n\n"
-        f"እንኳን ወደ Fast Bingo NextGen Pro በደህና መጡ! 🎲\n"
-        f"ከታች ያለውን አዝራር ተጭነው ጨዋታውን ይጀምሩ።"
+    await update.message.reply_text(
+        "ሰላም! እንኳን ወደ Fast Bingo NextGen Pro በደህና መጡ! 🎲\nከታች ያለውን አዝራር ተጭነው ይጫወቱ።", 
+        reply_markup=reply_markup
     )
-    
-    await update.message.reply_text(welcome_msg, reply_markup=reply_markup, parse_mode="Markdown")
 
 def main():
     threading.Thread(target=run_http_server, daemon=True).start()
 
-    TOKEN = os.environ.get("BOT_TOKEN", "8234368672:AAHaTtqt08OpQQmrDDjknqtdhH66FeF5Oss")
+    TOKEN = os.environ.get("BOT_TOKEN")
+    if not TOKEN or TOKEN == "YOUR_BOT_TOKEN_HERE":
+        # እዚህ ጋር በ BotFather የሰጠህን Token አስገባ
+        TOKEN = "8156382103:AAH..." # <--- የቦትህን Token እዚህ ጻፍ!
 
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
@@ -53,5 +54,5 @@ def main():
     print("Fast Bingo Bot is running...")
     app.run_polling()
 
-if name == "main":
+if __name__ == "__main__":
     main()
