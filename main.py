@@ -13,8 +13,8 @@ logging.basicConfig(
 
 # 1. Static WebApp Server Setup (Serves static/index.html)
 class WebAppHandler(SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory="static", **kwargs)
+    def init(self, *args, **kwargs):
+        super().init(*args, directory="static", **kwargs)
 
 def run_http_server():
     port = int(os.environ.get("PORT", 8000))
@@ -35,7 +35,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_first_name = update.effective_user.first_name
     welcome_msg = (
         f"ሰላም {user_first_name}! 👋\n\n"
-        f"እንኳን ወደ **Fast Bingo NextGen Pro** በደህና መጡ! 🎲\n"
+        f"እንኳን ወደ Fast Bingo NextGen Pro በደህና መጡ! 🎲\n"
         f"ከታች ያለውን አዝራር ተጭነው ጨዋታውን ይጀምሩ።"
     )
     
@@ -46,8 +46,8 @@ def main():
     # Start HTTP Static WebApp Server in a background thread
     threading.Thread(target=run_http_server, daemon=True).start()
 
-    # Telegram Bot Token (Render Environment Variable or Direct Token)
-    TOKEN = os.environ.get("BOT_TOKEN", "7832693998:AAElL55C1m_YOUR_BOT_TOKEN_HERE")
+    # Telegram Bot Token (ከመቀየርህ በፊት ያንተን Bot Token እዚህ አስገባ)
+    TOKEN = os.environ.get("BOT_TOKEN", "8234368672:AAHaTtqt08OpQQmrDDjknqtdhH66FeF5Oss")
 
     # Build and run python-telegram-bot
     app = ApplicationBuilder().token(TOKEN).build()
@@ -56,5 +56,5 @@ def main():
     print("Fast Bingo Bot is running...")
     app.run_polling()
 
-if __name__ == "__main__":
+if name == "main":
     main()
