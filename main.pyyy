@@ -1,0 +1,121 @@
+import os
+import random
+import logging
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+
+# Logging ማስተካከያ
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
+# የአንተ BOT TOKEN ቀጥታ ገብቷል
+TOKEN = "8234368672:AAFZDN-aClXvrOhThEap0j5Kv5yjxAUDE5g"
+
+# የጨዋታ መረጃዎችን መያዣ
+games = {}
+
+def generate_bingo_card():
+    """ 5x5 የቢንጎ ካርድ ማመንጫ """
+    card = []
+    columns = [
+        random.sample(range(1, 16), 5),   # B (1-15)
+        random.sample(range(16, 31), 5),  # I (16-30)
+        random.sample(range(31, 46), 5),  # N (31-45)
+        random.sample(range(46, 61), 5),  # G (46-60)
+        random.sample(range(61, 76), 5)   # O (61-75)
+    ]
+    
+    # 5x5 Matrix መስራት
+    for row in range(5):
+        row_data = []
+        for col in range(5):
+            if row == 2 and col == 2:
+                row_data.append("FREE")  # መሃል ላይ ነፃ ቦታ
+            else:
+                row_data.append(columns[col][row])
+        card.append(row_data)
+    return card
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """ /start ትእዛዝ """
+    welcome_text = (
+        "🎯 **እንኳን ወደ Red/Beteseb Bingo Bot በደህና መጡ!**\n\n"
+        "ለመጫወት የሚከተሉትን ትእዛዞች ይጠቀሙ፡\n"
+        "👉 /bingo - አዲስ የቢንጎ ካርድ ለማውጣት\n"
+        "👉 /draw - አዲስ የቢንጎ ቁጥር ለማውጣት (ለAdmin/ተጫዋች)\n"
+        "👉 /reset - ጨዋታውን አዲስ ለመጀመር"
+    )
+    await update.message.reply_text(welcome_text, parse_mode="Markdown")
+
+async def get_bingo_card(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """ /bingo - አዲስ ካርድ መስጫ """
+    user_id = update.effective_user.id
+    card = generate_bingo_card()
+    
+    card_text = "🎲 **የእርስዎ የቢንጎ ካርድ (Bingo Card)** 🎲\n\n"
+    card_text += "  B   |   I   |   N   |   G   |   O  \n"
+    card_text += "-----------------------------------\n"
+    
+    for row in card:
+        row_str = " | ".join(f"{str(val):^5}" for val in row)
+        card_text += f"{row_str}\n"
+        
+    card_text += "\nመልካም እድል! መልካም ጨዋታ!"
+    await update.message.reply_text(f"```\n{card_text}\n```", parse_mode="MarkdownV2")
+
+async def draw_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """ /draw - ቁጥር ማወጫ """
+    chat_id = update.effective_chat.id
+    if chat_id not in games:
+        games[chat_id] = list(range(1, 76))
+    
+    drawn_list = games[chat_id]
+    if not drawn_list:
+        await update.message.reply_text("❌ ሁሉም ቁጥሮች ወጥተዋል! አዲስ ጨዋታ ለመጀመር /reset ይበሉ።")
+        return
+
+    drawn_number = random.choice(drawn_list)
+    drawn_list.remove(drawn_number)
+    
+    # ፊደል መለየት
+    letter = ""
+    if 1 <= drawn_number <= 15:
+        letter = "B"
+    elif 16 <= drawn_number <= 30:
+        letter = "I"
+    elif 31 <= drawn_number <= 45:
+        letter = "N"
+    elif 46 <= drawn_number <= 60:
+        letter = "G"
+    elif 61 <= drawn_number <= 75:
+        letter = "O"
+
+    remaining = len(drawn_list)
+    await update.message.reply_text(
+        f"📣 የወጣው ቁጥር: **{letter}-{drawn_number}**\n"
+        f"📊 የቀሩ ቁጥሮች: {remaining}/75"
+    )
+
+async def reset_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """ /reset - ጨዋታውን አዲስ ማድረግ """
+    chat_id = update.effective_chat.id
+    games[chat_id] = list(range(1, 76))
+    await update.message.reply_text("🔄 ጨዋታው እንደ አዲስ ተጀምሯል! በድጋሚ /draw በማድረግ መጫወት ይችላሉ።")
+
+def main():
+    """ ቦቱን ማስነሻ """
+    app = Application.builder().token(TOKEN).build()
+
+    # Handlers
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("bingo", get_bingo_card))
+    app.add_handler(CommandHandler("draw", draw_number))
+    app.add_handler(CommandHandler("reset", reset_game))
+
+    print("✅ Bingo Bot በትክክል ስራ ጀምሯል...")
+    app.run_polling()
+
+if __name__ == '__main__':
+    main()
