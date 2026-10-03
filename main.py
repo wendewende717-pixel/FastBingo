@@ -26,7 +26,6 @@ def init_db():
         ''')
         conn.commit()
         conn.close()
-        logging.info("SQLite Database initialized successfully.")
     except Exception as e:
         logging.error(f"Database init error: {e}")
 
@@ -55,24 +54,56 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     get_or_create_user(user.id, user.first_name, user.username)
     
     url = get_webapp_url()
+    
+    # Exactly matching your preferred full menu layout
     keyboard = [
-        [InlineKeyboardButton("🎮 ቢንጎ ጨዋታ ጀምር (Play Bingo)", web_app=WebAppInfo(url=url))],
-        [InlineKeyboardButton("📢 ቻናል ይቀላቀሉ", url="https://t.me/your_channel"),
-         InlineKeyboardButton("👥 የቴሌግራም ቡድን", url="https://t.me/your_group")],
-        [InlineKeyboardButton("ℹ️ ስለ ቦቱ / እርዳታ", callback_data="help")]
+        [InlineKeyboardButton("🎮 ቢንጎ ተጫወት (Play Bingo)", web_app=WebAppInfo(url=url))],
+        [
+            InlineKeyboardButton("👤 ፕሮፋይል / ቀሪ ሂሳብ", callback_data="profile"),
+            InlineKeyboardButton("💳 ብር መሙያ (Deposit)", callback_data="deposit")
+        ],
+        [
+            InlineKeyboardButton("🤑 ብር ማውጫ (Withdraw)", callback_data="withdraw"),
+            InlineKeyboardButton("🎁 ብር ማስተላለፊያ", callback_data="transfer")
+        ],
+        [
+            InlineKeyboardButton("📖 መመሪያ (Instruction)", callback_data="instruction"),
+            InlineKeyboardButton("☎️ እገዛ (Support)", callback_data="support")
+        ],
+        [
+            InlineKeyboardButton("🔗 ጓደኛ ጋብዝ (Invite)", callback_data="invite"),
+            InlineKeyboardButton("🔄 ቦነስ መንኮራኩር", callback_data="spin")
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(
-        f"👋 **እንኳን ወደ Fast Bingo በሰላም መጡ {user.first_name}!**\n\n"
-        "ለመጫወት ከታች ያለውን **'🎮 ቢንጎ ጨዋታ ጀምር'** የሚለውን ቁልፍ ይጫኑ።",
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
+    
+    caption_text = (
+        f"🔥 **እንኳን ወደ Fast Bingo NextGen Pro በደህና መጡ!**\n\n"
+        f"ሰላም {user.first_name} 👋\n"
+        f"በኢትዮጵያ የመጀመሪያው እና ዘመናዊው የኦንላይን የቢንጎ ጨዋታ መድረክ ላይ ይገኛሉ።\n\n"
+        f"🎯 **ለመጫወት:-** ከታች የሚገኘውን '🎮 ቢንጎ ተጫወት' የሚለውን ቁልፍ ይጫኑ።\n"
+        f"💰 **የአካውንትዎ መረጃ:-** '👤 ፕሮፋይል / ቀሪ ሂሳብ' የሚለውን በመጫን ይመልከቱ።"
     )
+
+    # Sending image logo with full text and keyboard buttons
+    photo_url = "https://raw.githubusercontent.com/wendewende717-pixel/FastBingo/main/logo.jpg"
+    try:
+        await update.message.reply_photo(
+            photo=photo_url,
+            caption=caption_text,
+            reply_markup=reply_markup,
+            parse_mode="Markdown"
+        )
+    except Exception:
+        await update.message.reply_text(
+            text=caption_text,
+            reply_markup=reply_markup,
+            parse_mode="Markdown"
+        )
 
 def run_http_server():
     server_address = ('', 8000)
     httpd = HTTPServer(server_address, SimpleHTTPRequestHandler)
-    logging.info("Starting HTTP server on port 8000...")
     httpd.serve_forever()
 
 def main():
@@ -82,8 +113,6 @@ def main():
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    
-    logging.info("Starting Telegram Bot...")
     app.run_polling()
 
 if __name__ == "__main__":
