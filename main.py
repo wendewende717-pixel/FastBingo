@@ -27,27 +27,25 @@ def run_http_server():
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    user_id = user.id
-    first_name = user.first_name
+    first_name = user.first_name if user.first_name else "ተጫዋች"
     
-    account_id = f"FB-{user_id}"
     web_app_url = "https://my-fastbingo-app.onrender.com"
 
     keyboard = [
-        [InlineKeyboardButton("🎮 ቢንጎ ተጫወት (Play)", web_app=WebAppInfo(url=web_app_url)), InlineKeyboardButton("📝 ምዝገባ", callback_data="reg")],
-        [InlineKeyboardButton("💵 ቀሪ ሂሳብ (Balance)", callback_data="bal"), InlineKeyboardButton("💳 ብር መሙያ (Deposit)", callback_data="dep")],
-        [InlineKeyboardButton("☎️ እገዛ (Support)", callback_data="sup"), InlineKeyboardButton("📖 መመሪያ (Instruction)", callback_data="inst")],
-        [InlineKeyboardButton("🎁 ብር ማስተላለፊያ", callback_data="trans"), InlineKeyboardButton("🤑 ብር ማውጫ (Withdraw)", callback_data="with")],
-        [InlineKeyboardButton("🔗 ጓደኛ ጋብዝ (Invite)", callback_data="inv"), InlineKeyboardButton("🔄 ቦነስ ቀይር", callback_data="bon")]
+        [InlineKeyboardButton("🎮 ቢንጎ ተጫወት (Play Bingo)", web_app=WebAppInfo(url=web_app_url))],
+        [InlineKeyboardButton("👤 ፕሮፋይል / ቀሪ ሂሳብ", callback_data="bal"), InlineKeyboardButton("💳 ብር መሙያ (Deposit)", callback_data="dep")],
+        [InlineKeyboardButton("🤑 ብር ማውጫ (Withdraw)", callback_data="with"), InlineKeyboardButton("🎁 ብር ማስተላለፊያ", callback_data="trans")],
+        [InlineKeyboardButton("📖 መመሪያ (Instruction)", callback_data="inst"), InlineKeyboardButton("☎️ እገዛ (Support)", callback_data="sup")],
+        [InlineKeyboardButton("🔗 ጓደኛ ጋብዝ (Invite)", callback_data="inv"), InlineKeyboardButton("🔄 ቦነስ መመንዘሪያ", callback_data="bon")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     welcome_txt = (
-        f"👋 እንኳን ወደ **Fast Bingo NextGen Pro** በደህና መጡ!\n\n"
-        f"👤 **ስም:** {first_name}\n"
-        f"🆔 **የእርስዎ ቋሚ ID:** `{account_id}`\n"
-        f"💰 **የአካውንትዎ ቀሪ ሂሳብ:** 0.0 ብር\n\n"
-        f"ከታች ካሉት አማራጮች አንዱን ይምረጡ፦"
+        f"🔥 **እንኳን ወደ Fast Bingo NextGen Pro በደህና መጡ!**\n\n"
+        f"ሰላም **{first_name}**👋\n"
+        f"በኢትዮጵያ የመጀመሪያው እና ዘመናዊው የኦንላይን የቢንጎ ጨዋታ መድረክ ላይ ይገኛሉ።\n\n"
+        f"🎯 **ለመጫወት፦** ከታች የሚገኘውን **'🎮 ቢንጎ ተጫወት'** የሚለውን ቁልፍ ይጫኑ።\n"
+        f"💰 **የአካውንትዎ መረጃ፦** **'👤 ፕሮፋይል / ቀሪ ሂሳብ'** የሚለውን በመጫን ይመልከቱ።"
     )
 
     photo_path = "static/logo.png"
@@ -73,21 +71,28 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     user = query.from_user
     account_id = f"FB-{user.id}"
+    first_name = user.first_name if user.first_name else "ተጫዋች"
 
     data = query.data
 
     if data == "bal":
-        await query.message.reply_text(f"💵 **የቀሪ ሂሳብ መረጃ**\n\n🆔 ID: `{account_id}`\n💰 ቀሪ ሂሳብ: **0.0 ብር**", parse_mode="Markdown")
+        profile_txt = (
+            f"👤 **የተጫዋች ፕሮፋይል መረጃ**\n\n"
+            f"▫️ **ስም:** {first_name}\n"
+            f"▫️ **ቋሚ ID:** `{account_id}`\n"
+            f"💵 **ቀሪ ሂሳብ:** **0.00 ETB**\n"
+            f"🎁 **የቦነስ ነጥብ:** **0 Points**\n\n"
+            f"*(አካውንትዎ ላይ ብር ለመሙላት '💳 ብር መሙያ' የሚለውን ይጠቀሙ)*"
+        )
+        await query.message.reply_text(profile_txt, parse_mode="Markdown")
     elif data == "dep":
         await query.message.reply_text("💳 **ብር መሙያ (Deposit)**\n\nበቴሌብር (Telebirr) ወይም ቻፓ (Chapa) ሂሳብዎን መሙላት ይችላሉ።\nለማስገባት የሚፈልጉትን የብር መጠን ይጻፉ፦", parse_mode="Markdown")
     elif data == "with":
         await query.message.reply_text("🤑 **ብር ማውጫ (Withdraw)**\n\nዝቅተኛ የማውጫ መጠን: **50 ብር**\nለማውጣት የሚፈልጉትን የብር መጠን ይጻፉ፦", parse_mode="Markdown")
     elif data == "sup":
-        await query.message.reply_text("☎ **የደንበኞች እገዛ (Support)**\n\nለማንኛውም ጥያቄ ወይም አቤቱታ በቴሌግራም ያውሩን፦ @wende4366", parse_mode="Markdown")
+        await query.message.reply_text("☎️ **የደንበኞች እገዛ (Support)**\n\nለማንኛውም ጥያቄ ወይም አቤቱታ በቴሌግራም ያውሩን፦ @wende4366", parse_mode="Markdown")
     elif data == "inst":
         await query.message.reply_text("📖 **የጨዋታ መመሪያ (Instruction)**\n\n1. 'ቢንጎ ተጫወት' የሚለውን በመጫን ቦርዱን ይክፈቱ።\n2. ከ 1-600 ካርቴላዎች ውስጥ የሚፈልጉትን ይምረጡ።\n3. ቁጥሮች ሲጠሩ በራሱ ወይም በእጅዎ ይመልከቱ።\n4. ቀድመው ቢንጎ ሲሰሩ ያሸንፋሉ!", parse_mode="Markdown")
-    elif data == "reg":
-        await query.message.reply_text(f"📝 **የምዝገባ መረጃ**\n\nተመዝግበዋል! የቋሚ መለያ ቁጥርዎ: `{account_id}` ነው::", parse_mode="Markdown")
     elif data == "trans":
         await query.message.reply_text("🎁 **ብር ማስተላለፊያ (Transfer)**\n\nለሌላ ተጫዋች ብር ለማስተላለፍ የያዙትን ID ያስገቡ፦", parse_mode="Markdown")
     elif data == "inv":
