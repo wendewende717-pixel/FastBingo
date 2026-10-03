@@ -10,9 +10,6 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# 100% የሚሰራ አስተማማኝ የቴሌግራም ምስል ሊንክ
-BANNER_PHOTO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/512px-Telegram_logo.svg.png"
-
 class CustomWebAppHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory="static", **kwargs)
@@ -33,7 +30,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = user.id
     first_name = user.first_name
     
-    # ቋሚ ID = የቴሌግራም User ID (በጭራሽ አይቀየርም)
     account_id = f"FB-{user_id}"
     web_app_url = "https://my-fastbingo-app.onrender.com"
 
@@ -54,18 +50,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"ከታች ካሉት አማራጮች አንዱን ይምረጡ፦"
     )
 
-    # ፎቶውን በ send_photo መላክ
+    photo_path = "static/logo.png"
+
     try:
-        await context.bot.send_photo(
-            chat_id=update.effective_chat.id,
-            photo=BANNER_PHOTO_URL,
-            caption=welcome_txt,
-            reply_markup=reply_markup,
-            parse_mode="Markdown"
-        )
+        if os.path.exists(photo_path):
+            with open(photo_path, 'rb') as photo_file:
+                await context.bot.send_photo(
+                    chat_id=update.effective_chat.id,
+                    photo=photo_file,
+                    caption=welcome_txt,
+                    reply_markup=reply_markup,
+                    parse_mode="Markdown"
+                )
+        else:
+            await update.message.reply_text(welcome_txt, reply_markup=reply_markup, parse_mode="Markdown")
     except Exception as e:
         logging.error(f"Failed to send photo: {e}")
-        # ፎቶ መላክ ካልተቻለ እንደ መለወጫ ጽሑፍ ይልካል
         await update.message.reply_text(welcome_txt, reply_markup=reply_markup, parse_mode="Markdown")
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
