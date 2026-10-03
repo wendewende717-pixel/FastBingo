@@ -10,6 +10,9 @@ logging.basicConfig(
     level=logging.INFO
 )
 
+# 100% የሚሰራ አስተማማኝ የቴሌግራም ምስል ሊንክ
+BANNER_PHOTO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/512px-Telegram_logo.svg.png"
+
 class CustomWebAppHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory="static", **kwargs)
@@ -33,7 +36,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # ቋሚ ID = የቴሌግራም User ID (በጭራሽ አይቀየርም)
     account_id = f"FB-{user_id}"
     web_app_url = "https://my-fastbingo-app.onrender.com"
-    photo_path = "static/photo.jpg"
 
     keyboard = [
         [InlineKeyboardButton("🎮 ቢንጎ ተጫወት (Play)", web_app=WebAppInfo(url=web_app_url)), InlineKeyboardButton("📝 ምዝገባ", callback_data="reg")],
@@ -52,29 +54,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"ከታች ካሉት አማራጮች አንዱን ይምረጡ፦"
     )
 
-    # ፎቶው በአካባቢው (Local) ካለ ይልካል፣ ካልሆነ በሊንክ ወይም በጽሁፍ ይልካል
+    # ፎቶውን በ send_photo መላክ
     try:
-        if os.path.exists(photo_path):
-            with open(photo_path, 'rb') as photo_file:
-                await context.bot.send_photo(
-                    chat_id=update.effective_chat.id,
-                    photo=photo_file,
-                    caption=welcome_txt,
-                    reply_markup=reply_markup,
-                    parse_mode="Markdown"
-                )
-        else:
-            # Render Static URL Fallback
-            render_photo_url = "https://my-fastbingo-app.onrender.com/photo.jpg"
-            await context.bot.send_photo(
-                chat_id=update.effective_chat.id,
-                photo=render_photo_url,
-                caption=welcome_txt,
-                reply_markup=reply_markup,
-                parse_mode="Markdown"
-            )
+        await context.bot.send_photo(
+            chat_id=update.effective_chat.id,
+            photo=BANNER_PHOTO_URL,
+            caption=welcome_txt,
+            reply_markup=reply_markup,
+            parse_mode="Markdown"
+        )
     except Exception as e:
-        logging.error(f"Error sending photo: {e}")
+        logging.error(f"Failed to send photo: {e}")
+        # ፎቶ መላክ ካልተቻለ እንደ መለወጫ ጽሑፍ ይልካል
         await update.message.reply_text(welcome_txt, reply_markup=reply_markup, parse_mode="Markdown")
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
