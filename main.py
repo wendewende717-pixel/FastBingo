@@ -10,8 +10,8 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# የባነር ፎቶ Link (ቀጥታ ከኦንላይን ይወስደዋል)
-BANNER_PHOTO_URL = "https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/docs/source/_static/telegram-logo.png" # ወይም የራስህ የቴሌግራም ፎቶ Link
+# የላክልን የ FAST BINGO ሎጎ Direct Image Link
+BANNER_PHOTO_URL = "https://i.ibb.co/C31mB6t/IMG-20261002-232350-982.jpg"
 
 class CustomWebAppHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -33,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = user.id
     first_name = user.first_name
     
-    # ቋሚ ID = የቴሌግራም User IDህ (በጭራሽ አይቀየርም!)
+    # ቋሚ ID = የቴሌግራም User ID (በጭራሽ አይቀየርም)
     account_id = f"FB-{user_id}"
     web_app_url = "https://my-fastbingo-app.onrender.com"
 
@@ -54,7 +54,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"ከታች ካሉት አማራጮች አንዱን ይምረጡ፦"
     )
 
-    # ፎቶውን በ Caption መልእክት ይልካል
     try:
         await context.bot.send_photo(
             chat_id=update.effective_chat.id,
