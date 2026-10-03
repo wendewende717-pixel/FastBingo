@@ -1,15 +1,64 @@
 import os
 import logging
+import sqlite3
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
+# Logging setup
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
+# ----------------------------------------------------
+# DATABASE SETUP (SQLite)
+# ----------------------------------------------------
+DB_NAME = "fast_bingo.db"
+
+def init_sqlite_db():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY,
+            first_name TEXT,
+            username TEXT,
+            balance REAL DEFAULT 10.0,
+            bonus_points INTEGER DEFAULT 0,
+            joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+def get_or_create_user(user_id, first_name, username):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id, balance, bonus_points FROM users WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+    
+    if row is None:
+        # አዲስ ተጫዋች ሲመዘገብ 10 ብር ነጻ ቦነስ ይሰጠዋል
+        initial_balance = 10.0
+        cursor.execute(
+            "INSERT INTO users (user_id, first_name, username, balance) VALUES (?, ?, ?, ?)",
+            (user_id, first_name, username, initial_balance)
+        )
+        conn.commit()
+        conn.close()
+        return {"balance": initial_balance, "bonus_points": 0, "is_new": True}
+    else:
+        conn.close()
+        return {"balance": row[1], "bonus_points": row[2], "is_new": False}
+
+# Initialize Database
+init_sqlite_db()
+
+# ----------------------------------------------------
+# WEB SERVER FOR WEBAPP
+# ----------------------------------------------------
 class CustomWebAppHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory="static", **kwargs)
@@ -25,9 +74,16 @@ def run_http_server():
     print(f"Serving WebApp on port {port}...")
     server.serve_forever()
 
+# ----------------------------------------------------
+# TELEGRAM BOT HANDLERS
+# ----------------------------------------------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     first_name = user.first_name if user.first_name else "ተጫዋች"
+    username = user.username if user.username else ""
+    
+    # Save/Retrieve from DB
+    user_data = get_or_create_user(user.id, first_name, username)
     
     web_app_url = "https://my-fastbingo-app.onrender.com"
 
@@ -40,9 +96,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
+    bonus_msg = "\n🎉 **የ 10 ብር ነፃ መመዝገቢያ ቦነስ ተሰጥቶዎታል!**\n" if user_data["is_new"] else ""
+
     welcome_txt = (
         f"🔥 **እንኳን ወደ Fast Bingo NextGen Pro በደህና መጡ!**\n\n"
-        f"ሰላም **{first_name}**👋\n"
+        f"ሰላም **{first_name}**👋{bonus_msg}\n"
         f"በኢትዮጵያ የመጀመሪያው እና ዘመናዊው የኦንላይን የቢንጎ ጨዋታ መድረክ ላይ ይገኛሉ።\n\n"
         f"🎯 **ለመጫወት፦** ከታች የሚገኘውን **'🎮 ቢንጎ ተጫወት'** የሚለውን ቁልፍ ይጫኑ።\n"
         f"💰 **የአካውንትዎ መረጃ፦** **'👤 ፕሮፋይል / ቀሪ ሂሳብ'** የሚለውን በመጫን ይመልከቱ።"
@@ -72,6 +130,10 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = query.from_user
     account_id = f"FB-{user.id}"
     first_name = user.first_name if user.first_name else "ተጫዋች"
+    username = user.username if user.username else ""
+
+    # Fetch live user data from Database
+    user_data = get_or_create_user(user.id, first_name, username)
 
     data = query.data
 
@@ -80,8 +142,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"👤 **የተጫዋች ፕሮፋይል መረጃ**\n\n"
             f"▫️ **ስም:** {first_name}\n"
             f"▫️ **ቋሚ ID:** `{account_id}`\n"
-            f"💵 **ቀሪ ሂሳብ:** **0.00 ETB**\n"
-            f"🎁 **የቦነስ ነጥብ:** **0 Points**\n\n"
+            f"💵 **ቀሪ ሂሳብ:** **{user_data['balance']:.2f} ETB**\n"
+            f"🎁 **የቦነስ ነጥብ:** **{user_data['bonus_points']} Points**\n\n"
             f"*(አካውንትዎ ላይ ብር ለመሙላት '💳 ብር መሙያ' የሚለውን ይጠቀሙ)*"
         )
         await query.message.reply_text(profile_txt, parse_mode="Markdown")
@@ -90,7 +152,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "with":
         await query.message.reply_text("🤑 **ብር ማውጫ (Withdraw)**\n\nዝቅተኛ የማውጫ መጠን: **50 ብር**\nለማውጣት የሚፈልጉትን የብር መጠን ይጻፉ፦", parse_mode="Markdown")
     elif data == "sup":
-        await query.message.reply_text("☎️ **የደንበኞች እገዛ (Support)**\n\nለማንኛውም ጥያቄ ወይም አቤቱታ በቴሌግራም ያውሩን፦ @wende4366", parse_mode="Markdown")
+        await query.message.reply_text("☎️️ **የደንበኞች እገዛ (Support)**\n\nለማንኛውም ጥያቄ ወይም አቤቱታ በቴሌግራም ያውሩን፦ @wende4366", parse_mode="Markdown")
     elif data == "inst":
         await query.message.reply_text("📖 **የጨዋታ መመሪያ (Instruction)**\n\n1. 'ቢንጎ ተጫወት' የሚለውን በመጫን ቦርዱን ይክፈቱ።\n2. ከ 1-600 ካርቴላዎች ውስጥ የሚፈልጉትን ይምረጡ።\n3. ቁጥሮች ሲጠሩ በራሱ ወይም በእጅዎ ይመልከቱ።\n4. ቀድመው ቢንጎ ሲሰሩ ያሸንፋሉ!", parse_mode="Markdown")
     elif data == "trans":
@@ -111,7 +173,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_callback))
 
-    print("Fast Bingo Bot running smoothly...")
+    print("Fast Bingo Bot with SQLite DB running smoothly...")
     app.run_polling()
 
 if __name__ == "__main__":
