@@ -40,7 +40,6 @@ def get_or_create_user(user_id, first_name, username):
     row = cursor.fetchone()
     
     if row is None:
-        # አዲስ ተጫዋች ሲመዘገብ 10 ብር ነጻ ቦነስ ይሰጠዋል
         initial_balance = 10.0
         cursor.execute(
             "INSERT INTO users (user_id, first_name, username, balance) VALUES (?, ?, ?, ?)",
@@ -87,6 +86,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     web_app_url = "https://my-fastbingo-app.onrender.com"
 
+    # የቅድሙ 9 በተኖች በምስሉ ላይ እንደነበረው (1 Full Width + 8 Grid Buttons)
     keyboard = [
         [InlineKeyboardButton("🎮 ቢንጎ ተጫወት (Play Bingo)", web_app=WebAppInfo(url=web_app_url))],
         [InlineKeyboardButton("👤 ፕሮፋይል / ቀሪ ሂሳብ", callback_data="bal"), InlineKeyboardButton("💳 ብር መሙያ (Deposit)", callback_data="dep")],
@@ -96,11 +96,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    bonus_msg = "\n🎉 **የ 10 ብር ነፃ መመዝገቢያ ቦነስ ተሰጥቶዎታል!**\n" if user_data["is_new"] else ""
+    bonus_msg = "\n🎉 **የ 10 ETB ነፃ የመመዝገቢያ ቦነስ ተጨምሮልዎታል!**\n" if user_data["is_new"] else ""
 
     welcome_txt = (
         f"🔥 **እንኳን ወደ Fast Bingo NextGen Pro በደህና መጡ!**\n\n"
-        f"ሰላም **{first_name}**👋{bonus_msg}\n"
+        f"ሰላም **{first_name}** 👋{bonus_msg}\n"
         f"በኢትዮጵያ የመጀመሪያው እና ዘመናዊው የኦንላይን የቢንጎ ጨዋታ መድረክ ላይ ይገኛሉ።\n\n"
         f"🎯 **ለመጫወት፦** ከታች የሚገኘውን **'🎮 ቢንጎ ተጫወት'** የሚለውን ቁልፍ ይጫኑ።\n"
         f"💰 **የአካውንትዎ መረጃ፦** **'👤 ፕሮፋይል / ቀሪ ሂሳብ'** የሚለውን በመጫን ይመልከቱ።"
@@ -152,7 +152,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "with":
         await query.message.reply_text("🤑 **ብር ማውጫ (Withdraw)**\n\nዝቅተኛ የማውጫ መጠን: **50 ብር**\nለማውጣት የሚፈልጉትን የብር መጠን ይጻፉ፦", parse_mode="Markdown")
     elif data == "sup":
-        await query.message.reply_text("☎️️ **የደንበኞች እገዛ (Support)**\n\nለማንኛውም ጥያቄ ወይም አቤቱታ በቴሌግራም ያውሩን፦ @wende4366", parse_mode="Markdown")
+        await query.message.reply_text("☎️ **የደንበኞች እገዛ (Support)**\n\nለማንኛውም ጥያቄ ወይም አቤቱታ በቴሌግራም ያውሩን፦ @wende4366", parse_mode="Markdown")
     elif data == "inst":
         await query.message.reply_text("📖 **የጨዋታ መመሪያ (Instruction)**\n\n1. 'ቢንጎ ተጫወት' የሚለውን በመጫን ቦርዱን ይክፈቱ።\n2. ከ 1-600 ካርቴላዎች ውስጥ የሚፈልጉትን ይምረጡ።\n3. ቁጥሮች ሲጠሩ በራሱ ወይም በእጅዎ ይመልከቱ።\n4. ቀድመው ቢንጎ ሲሰሩ ያሸንፋሉ!", parse_mode="Markdown")
     elif data == "trans":
@@ -166,14 +166,12 @@ def main():
     threading.Thread(target=run_http_server, daemon=True).start()
 
     TOKEN = os.environ.get("BOT_TOKEN")
-    if not TOKEN or TOKEN == "YOUR_BOT_TOKEN_HERE":
-        TOKEN = "8156382103:AAH..." # <--- የቦትህ Token
 
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_callback))
 
-    print("Fast Bingo Bot with SQLite DB running smoothly...")
+    print("Fast Bingo Bot running smoothly...")
     app.run_polling()
 
 if __name__ == "__main__":
