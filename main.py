@@ -1,7 +1,6 @@
 import os
 import logging
-from http.server import HTTPServer, SimpleHTTPRequestHandler
-import threading
+from fastapi import FastAPI, Request
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes
 
@@ -10,16 +9,8 @@ logging.basicConfig(level=logging.INFO)
 WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://my-fastbingo-app.onrender.com")
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 
-class QuietHTTPRequestHandler(SimpleHTTPRequestHandler):
-    def log_message(self, format, *args):
-        pass
-
-def run_http_server():
-    port = int(os.environ.get("PORT", 8000))
-    server_address = ('', port)
-    httpd = HTTPServer(server_address, QuietHTTPRequestHandler)
-    print(f"HTTP WebApp server running on port {port}...")
-    httpd.serve_forever()
+app = FastAPI()
+telegram_app = None
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -56,18 +47,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(caption, reply_markup=reply_markup, parse_mode="Markdown")
 
-def main():
-    threading.Thread(target=run_http_server, daemon=True).start()
-    
-    if not BOT_TOKEN:
-        print("ERROR: BOT_TOKEN is missing!")
-        return
+@app.on_event("startup")
+async def startup_event():
+    global telegram_app
+    if BOT_TOKEN:
+        telegram_app = Application.builder().token(BOT_TOKEN).build()
+        telegram_app.add_handler(CommandHandler("start", start))
+        await telegram_app.initialize()
+        await telegram_app.start()
+        # Webhook ማሰር (Conflict ኤረርን በቋሚነት ያስቀረዋል)
+        webhook_url = f"{WEBAPP_URL}/webhook"
+        await telegram_app.bot.set_webhook(url=webhook_url, drop_pending_updates=True)
+        logging.info(f"Webhook set to {webhook_url}")
 
-    application = Application.builder().token(BOT_TOKEN).build()
-    application.add_handler(CommandHandler("start", start))
-    
-    print("Fast Bingo Pro Bot is starting...")
-    application.run_polling(drop_pending_updates=True, close_loop=False)
+@app.post("/webhook")
+async def webhook_handler(request: Request):
+    data = await request.json()
+    update = Update.de_json(data, telegram_app.bot)
+    await telegram_app.process_update(update)
+    return {"status": "ok"}
 
-if __name__ == "__main__":
-    main()
+@app.get("/")
+async def root():
+    return {"message": "Fast Bingo Bot and WebApp is running smoothly via Webhook!"}
