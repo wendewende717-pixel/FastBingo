@@ -14,6 +14,7 @@
             --taken-card-red: #dc2626;
             --free-card-bg: #334155;
             --text-gold: #fbbf24;
+            --bingo-green: #16a34a;
         }
 
         * {
@@ -36,26 +37,20 @@
         /* NAVBAR */
         .header {
             background-color: #1e293b;
-            padding: 10px 15px;
+            padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #334155;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         .balance-badge {
             background: linear-gradient(135deg, #16a34a, #15803d);
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 4px 10px;
+            border-radius: 15px;
             font-weight: bold;
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         /* PAGES */
@@ -63,8 +58,8 @@
             display: none;
             flex: 1;
             flex-direction: column;
-            padding: 10px;
-            height: calc(100vh - 55px);
+            padding: 8px;
+            height: calc(100vh - 50px);
             overflow-y: auto;
         }
 
@@ -72,23 +67,21 @@
             display: flex;
         }
 
-        /* ROOM SELECTION PAGE */
+        /* ROOM SELECTION */
         .rooms-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-top: 10px;
-            padding-bottom: 20px;
         }
 
         .room-card {
             background: linear-gradient(145deg, #1e293b, #0f172a);
             border: 2px solid #38bdf8;
             border-radius: 12px;
-            padding: 18px 8px;
+            padding: 15px 8px;
             text-align: center;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
         .room-card.vip {
@@ -97,28 +90,7 @@
             grid-column: span 2;
         }
 
-        .room-card:active {
-            transform: scale(0.97);
-        }
-
-        .room-title {
-            color: var(--text-gold);
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .room-price {
-            font-size: 20px;
-            margin-top: 6px;
-            color: #38bdf8;
-            font-weight: 800;
-        }
-
-        .room-card.vip .room-price {
-            color: var(--text-gold);
-        }
-
-        /* GAME BOARD PAGE */
+        /* STATS BAR */
         .game-stats-bar {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -149,81 +121,34 @@
             color: #38bdf8;
         }
 
-        .legend-bar {
-            display: flex;
-            justify-content: space-around;
-            background: #1e293b;
-            padding: 5px;
-            border-radius: 6px;
-            margin-bottom: 6px;
+        /* 600 CARDS MAIN SELECTOR GRID */
+        .grid-section-title {
             font-size: 11px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .color-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
-        }
-
-        /* ACTION INPUT & BUTTONS BAR */
-        .quick-action-bar {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-        }
-
-        .lucky-input {
-            width: 110px;
-            padding: 6px;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: #fff;
-            font-size: 11px;
-            text-align: center;
-        }
-
-        .btn-quick {
-            flex: 1;
-            padding: 6px;
-            border-radius: 6px;
-            border: none;
-            font-size: 11px;
+            color: var(--text-gold);
+            margin-bottom: 4px;
             font-weight: bold;
-            color: white;
-            cursor: pointer;
         }
 
-        .btn-lucky { background-color: #0284c7; }
-        .btn-auto-pick { background-color: #16a34a; }
-        .btn-taken-info { background-color: #d97706; }
-
-        /* FULL SCREEN BINGO CARDS GRID (600 CARDS) */
         .cards-container {
-            flex: 1;
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 4px;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 3px;
             background: #1e293b;
             padding: 6px;
             border-radius: 8px;
             overflow-y: auto;
-            max-height: 50vh;
+            max-height: 25vh;
+            margin-bottom: 8px;
+            border: 1px solid #334155;
         }
 
         .bingo-card-btn {
             background-color: var(--free-card-bg);
             color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 3px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -239,32 +164,113 @@
         .bingo-card-btn.mine {
             background-color: var(--my-card-blue) !important;
             color: #ffffff;
-            border: 2px solid #60a5fa;
-            box-shadow: 0 0 6px #2563eb;
+            border: 1.5px solid #60a5fa;
+            box-shadow: 0 0 4px #2563eb;
         }
 
-        /* CONTROL FOOTER */
+        /* MY SELECTED BINGO CARDS SECTION (3 IN A ROW GRID) */
+        .my-cards-section {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 6px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .my-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+            gap: 6px;
+        }
+
+        .my-bingo-card {
+            background: #1e293b;
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .my-card-header {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-gold);
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        /* BINGO MATRIX (5x5 MINI GRID) */
+        .bingo-matrix {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            width: 100%;
+            background: #0f172a;
+            padding: 2px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        .bingo-cell {
+            background: #334155;
+            color: #fff;
+            font-size: 9px;
+            font-weight: bold;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+        }
+
+        .bingo-cell.free {
+            background: #d97706;
+            color: #fff;
+        }
+
+        .btn-bingo-claim {
+            width: 100%;
+            padding: 4px 0;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .btn-bingo-claim:active {
+            transform: scale(0.95);
+        }
+
+        /* FOOTER CONTROLS */
         .game-footer {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 6px;
             margin-top: 6px;
-            padding-bottom: 4px;
         }
 
         .btn-action {
-            padding: 10px;
+            padding: 8px;
             border-radius: 6px;
             border: none;
             font-weight: bold;
             color: white;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .btn-leave { background-color: #ef4444; }
         .btn-refresh { background-color: #f59e0b; }
-        .btn-auto { background-color: #10b981; }
     </style>
 </head>
 <body>
@@ -272,7 +278,7 @@
     <!-- NAVBAR -->
     <div class="header">
         <div class="user-info">
-            <span id="user-name" style="font-weight: bold;">ተጫዋች</span>
+            <span id="user-name" style="font-weight: bold; font-size: 13px;">ተጫዋች</span>
         </div>
         <div class="balance-badge" id="user-balance">50 ETB</div>
     </div>
@@ -281,42 +287,21 @@
     <div id="p-rooms" class="page active">
         <h3 style="text-align: center; color: var(--text-gold); margin: 5px 0 10px 0;">🎯 የጨዋታ ክፍል ይምረጡ</h3>
         <div class="rooms-grid">
-            <div class="room-card" onclick="selectRoom('FB-5', 5)">
-                <div class="room-title">ክፍል 5</div>
-                <div class="room-price">5 ETB</div>
-            </div>
             <div class="room-card" onclick="selectRoom('FB-10', 10)">
-                <div class="room-title">ክፍል 10</div>
-                <div class="room-price">10 ETB</div>
-            </div>
-            <div class="room-card" onclick="selectRoom('FB-15', 15)">
-                <div class="room-title">ክፍል 15</div>
-                <div class="room-price">15 ETB</div>
+                <div style="color: var(--text-gold); font-weight: bold;">ክፍል 10</div>
+                <div style="font-size: 18px; color: #38bdf8; font-weight: 800;">10 ETB</div>
             </div>
             <div class="room-card" onclick="selectRoom('FB-20', 20)">
-                <div class="room-title">ክፍል 20</div>
-                <div class="room-price">20 ETB</div>
-            </div>
-            <div class="room-card" onclick="selectRoom('FB-25', 25)">
-                <div class="room-title">ክፍል 25</div>
-                <div class="room-price">25 ETB</div>
+                <div style="color: var(--text-gold); font-weight: bold;">ክፍል 20</div>
+                <div style="font-size: 18px; color: #38bdf8; font-weight: 800;">20 ETB</div>
             </div>
             <div class="room-card" onclick="selectRoom('FB-50', 50)">
-                <div class="room-title">ክፍል 50</div>
-                <div class="room-price">50 ETB</div>
+                <div style="color: var(--text-gold); font-weight: bold;">ክፍል 50</div>
+                <div style="font-size: 18px; color: #38bdf8; font-weight: 800;">50 ETB</div>
             </div>
-            <div class="room-card" onclick="selectRoom('FB-100', 100)">
-                <div class="room-title">ክፍል 100</div>
-                <div class="room-price">100 ETB</div>
-            </div>
-            <div class="room-card" onclick="selectRoom('FB-200', 200)">
-                <div class="room-title">ክፍል 200</div>
-                <div class="room-price">200 ETB</div>
-            </div>
-            <!-- VIP ROOM -->
-            <div class="room-card vip" onclick="selectRoom('FB-VIP', 500)">
-                <div class="room-title">👑 VIP ቪአይፒ ክፍል</div>
-                <div class="room-price">500 ETB</div>
+            <div class="room-card vip" onclick="selectRoom('FB-VIP', 100)">
+                <div style="color: var(--text-gold); font-weight: bold;">👑 VIP ክፍል</div>
+                <div style="font-size: 18px; color: var(--text-gold); font-weight: 800;">100 ETB</div>
             </div>
         </div>
     </div>
@@ -335,10 +320,10 @@
             </div>
             <div class="stat-box">
                 <span class="stat-label">BET</span>
-                <span class="stat-val" id="game-bet">5 ETB</span>
+                <span class="stat-val" id="game-bet">10 ETB</span>
             </div>
             <div class="stat-box">
-                <span class="stat-label">DERASH</span>
+                <span class="stat-label">DERASH (80%)</span>
                 <span class="stat-val" id="game-derash">0 ETB</span>
             </div>
             <div class="stat-box">
@@ -347,56 +332,47 @@
             </div>
         </div>
 
-        <!-- QUICK ACTION BAR -->
-        <div class="quick-action-bar">
-            <input type="number" id="lucky-num" class="lucky-input" placeholder="ቁጥር (1-600)" min="1" max="600">
-            <button class="btn-quick btn-lucky" onclick="selectLuckyNumber()">ምረጥ</button>
-            <button class="btn-quick btn-auto-pick" onclick="autoSelectCard()">ሲስተሙ ይምረጥ</button>
-            <button class="btn-quick btn-taken-info" onclick="showTakenCardsInfo()">የተያዙ (0)</button>
-        </div>
-
-        <!-- LEGEND GUIDE -->
-        <div class="legend-bar">
-            <div class="legend-item">
-                <div class="color-dot" style="background: var(--free-card-bg);"></div>
-                <span>ክፍት</span>
-            </div>
-            <div class="legend-item">
-                <div class="color-dot" style="background: var(--taken-card-red);"></div>
-                <span>የተያዘ</span>
-            </div>
-            <div class="legend-item">
-                <div class="color-dot" style="background: var(--my-card-blue);"></div>
-                <span>የኔ ካርቴላ</span>
-            </div>
-        </div>
-
-        <!-- FULL SCREEN CARDS GRID (600) -->
+        <!-- MAIN CARDS SELECTION (1-600) -->
+        <div class="grid-section-title">📌 የካርቴላዎች ማውጫ (ከ1-600) — [ቀይ: የተያዘ | ሰማያዊ: የእኔ]</div>
         <div class="cards-container" id="cards-grid"></div>
+
+        <!-- MY SELECTED CARDS DISPLAY (3 IN A ROW) -->
+        <div class="my-cards-section">
+            <div class="grid-section-title" style="text-align: center; color: #38bdf8; font-size: 12px; margin-bottom: 6px;">
+                🎟️️ የእኔ የተያዙ ካርቴላዎች (My Selected Cards)
+            </div>
+            <div class="my-cards-grid" id="my-cards-container">
+                <!-- Selected Cards with 5x5 Grid and BINGO buttons will be dynamically rendered here -->
+            </div>
+        </div>
 
         <!-- FOOTER -->
         <div class="game-footer">
-            <button class="btn-action btn-leave" onclick="leaveRoom()">Leave</button>
-            <button class="btn-action btn-refresh" onclick="refreshGrid()">Refresh</button>
-            <button class="btn-action btn-auto">Automatic: ON</button>
+            <button class="btn-action btn-leave" onclick="leaveRoom()">ውጣ (Leave)</button>
+            <button class="btn-action btn-refresh" onclick="refreshGrid()">አድስ (Refresh)</button>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram ? window.Telegram.WebApp : null;
-        let myBalance = 50.0;
-        let currentRoomPrice = 0;
+        let myBalance = 100.0;
+        let currentRoomPrice = 10;
         let myUserId = "Me";
 
-        // Game State Variables
         let myCards = [];
-        let takenCardsMap = {}; // Example: { 10: "Player1", 12: "Player1", 45: "Player2" }
-        let playerMap = {}; // Unique Player Tracking: { "Player1": ["Card10", "Card12"], "Player2": ["Card45"] }
-        
-        let timerSeconds = 60;
-        let timerInterval = null;
-        let isTimerRunning = false;
-        const MAX_CARDS_PER_PLAYER = 6;
+        let takenCardsMap = {}; // Example: { 5: "Player2", 12: "Player3" }
+        let playerMap = {};     // { "Me": [1, 2, 3], "Player2": [5] }
+
+        // Pre-fill dummy taken cards to demonstrate RED status
+        function initDemoTakenCards() {
+            const sampleTaken = [5, 12, 18, 24, 88, 102, 150, 210, 305, 412, 550];
+            sampleTaken.forEach((num, index) => {
+                const pId = "Player_" + (index % 3 + 1);
+                takenCardsMap[num] = pId;
+                if(!playerMap[pId]) playerMap[pId] = [];
+                playerMap[pId].push(num);
+            });
+        }
 
         function initApp() {
             if(tg) {
@@ -406,18 +382,14 @@
                     myUserId = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || "Me";
                 }
             }
-            renderCardsGrid();
+            initDemoTakenCards();
+            renderMainGrid();
+            updateStatsAndDerash();
         }
 
         function selectRoom(roomId, price) {
-            if(myBalance < price) {
-                alert("በቂ ቀሪ ሂሳብ የሎትም! እባክዎን አስቀድመው ብር ያስገቡ።");
-                return;
-            }
-            
             currentRoomPrice = price;
-            
-            document.getElementById('game-id').innerText = "#" + roomId + "-" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('game-id').innerText = "#" + roomId;
             document.getElementById('game-bet').innerText = price + " ETB";
 
             document.getElementById('p-rooms').classList.remove('active');
@@ -426,8 +398,8 @@
             updateStatsAndDerash();
         }
 
-        // Render 1 to 600 Bingo Cards
-        function renderCardsGrid() {
+        // Render 1 to 600 Main Grid
+        function renderMainGrid() {
             const grid = document.getElementById('cards-grid');
             grid.innerHTML = "";
 
@@ -437,202 +409,130 @@
                 btn.id = 'card-btn-' + i;
                 btn.innerText = i;
 
+                if(takenCardsMap[i]) {
+                    if(takenCardsMap[i] === myUserId) {
+                        btn.classList.add('mine');
+                    } else {
+                        btn.classList.add('taken');
+                    }
+                }
+
                 btn.onclick = function() {
-                    handleCardSelection(i);
+                    handleCardClick(i);
                 };
 
                 grid.appendChild(btn);
             }
         }
 
-        function handleCardSelection(cardNum) {
+        function handleCardClick(cardNum) {
             // 1. If taken by someone else
             if(takenCardsMap[cardNum] && takenCardsMap[cardNum] !== myUserId) {
-                alert(`ካርቴላ #${cardNum} በሌላ ተጫዋች (${takenCardsMap[cardNum]}) ተይዟል!`);
+                alert(`ካርቴላ #${cardNum} በሌላ ተጫዋች ተይዟል! (ቀይ)`);
                 return;
             }
 
-            // 2. If already selected by me (Deselect)
+            // 2. Deselecting my card
             if(myCards.includes(cardNum)) {
                 myCards = myCards.filter(c => c !== cardNum);
                 delete takenCardsMap[cardNum];
-                
-                // Remove from player map
                 if(playerMap[myUserId]) {
                     playerMap[myUserId] = playerMap[myUserId].filter(c => c !== cardNum);
-                    if(playerMap[myUserId].length === 0) {
-                        delete playerMap[myUserId];
-                    }
+                    if(playerMap[myUserId].length === 0) delete playerMap[myUserId];
                 }
-
                 myBalance += currentRoomPrice;
-            } else {
-                // 3. New selection (Max 6 limit check)
-                if(myCards.length >= MAX_CARDS_PER_PLAYER) {
-                    alert(`በአንድ ጨዋታ እስከ ${MAX_CARDS_PER_PLAYER} ካርቴላ ብቻ መያዝ ይችላሉ!`);
+            } 
+            // 3. Selecting new card (Max 6 limit)
+            else {
+                if(myCards.length >= 6) {
+                    alert("በአንድ ጊዜ እስከ 6 ካርቴላ ብቻ መያዝ ይችላሉ!");
                     return;
                 }
-
                 if(myBalance < currentRoomPrice) {
-                    alert("ተጨማሪ ካርቴላ ለመያዝ በቂ ቀሪ ሂሳብ የሎትም!");
+                    alert("በቂ ቀሪ ሂሳብ የሎትም!");
                     return;
                 }
 
                 myCards.push(cardNum);
                 takenCardsMap[cardNum] = myUserId;
 
-                if(!playerMap[myUserId]) {
-                    playerMap[myUserId] = [];
-                }
+                if(!playerMap[myUserId]) playerMap[myUserId] = [];
                 playerMap[myUserId].push(cardNum);
 
                 myBalance -= currentRoomPrice;
             }
 
             document.getElementById('user-balance').innerText = myBalance + " ETB";
-            updateGridVisuals();
+            renderMainGrid();
+            renderMySelectedCards();
             updateStatsAndDerash();
-            checkTimerTrigger();
         }
 
-        function updateGridVisuals() {
-            for(let i = 1; i <= 600; i++) {
-                const btn = document.getElementById('card-btn-' + i);
-                if(!btn) continue;
+        // Render My Cards (3 in a Row Layout)
+        function renderMySelectedCards() {
+            const container = document.getElementById('my-cards-container');
+            container.innerHTML = "";
 
-                btn.className = 'bingo-card-btn';
-
-                if(myCards.includes(i)) {
-                    btn.classList.add('mine');
-                } else if(takenCardsMap[i]) {
-                    btn.classList.add('taken');
-                }
+            if(myCards.length === 0) {
+                container.innerHTML = `<div style="grid-column: span 3; text-align: center; color: #64748b; padding: 20px; font-size: 11px;">እስካሁን ምንም ካርቴላ አልመረጡም። ከላይ ከ1-600 ካሉት ውስጥ ይምረጡ።</div>`;
+                return;
             }
+
+            myCards.forEach(cardNum => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'my-bingo-card';
+
+                // Matrix Generator (5x5 BINGO Numbers)
+                let matrixHTML = '';
+                for(let row = 0; row < 5; row++) {
+                    for(let col = 0; col < 5; col++) {
+                        if(row === 2 && col === 2) {
+                            matrixHTML += `<div class="bingo-cell free">FREE</div>`;
+                        } else {
+                            const val = (col * 15) + Math.floor(Math.random() * 15) + 1;
+                            matrixHTML += `<div class="bingo-cell">${val}</div>`;
+                        }
+                    }
+                }
+
+                cardDiv.innerHTML = `
+                    <div class="my-card-header">ካርቴላ #${cardNum}</div>
+                    <div class="bingo-matrix">
+                        ${matrixHTML}
+                    </div>
+                    <button class="btn-bingo-claim" onclick="claimBingo(${cardNum})">🔥 BINGO!</button>
+                `;
+
+                container.appendChild(cardDiv);
+            });
         }
 
         function updateStatsAndDerash() {
-            const totalTakenCards = Object.keys(takenCardsMap).length;
-            const uniquePlayersCount = Object.keys(playerMap).length;
+            const totalTaken = Object.keys(takenCardsMap).length;
+            const uniquePlayers = Object.keys(playerMap).length;
 
-            // 1. Update PLAYERS count (Actual Unique People, not cards count)
-            document.getElementById('game-players').innerText = uniquePlayersCount;
+            // Player Count = Unique People Count
+            document.getElementById('game-players').innerText = uniquePlayers;
 
-            // 2. Calculate Derash: Total Pool = Cards * Bet, Commission = 20%, Derash = 80%
-            const totalBetPool = totalTakenCards * currentRoomPrice;
-            const derashAmount = totalBetPool * 0.80; // 20% commission deducted
+            // Derash = Total Pool - 20% Commission (80% net derash)
+            const totalPool = totalTaken * currentRoomPrice;
+            const derash = totalPool * 0.80;
 
-            document.getElementById('game-derash').innerText = derashAmount + " ETB";
-            
-            // Update quick button info
-            const btnTaken = document.querySelector('.btn-taken-info');
-            if(btnTaken) {
-                btnTaken.innerText = `የተያዙ (${totalTakenCards})`;
-            }
+            document.getElementById('game-derash').innerText = derash + " ETB";
         }
 
-        // Timer starts only when 2nd Player buys a card
-        function checkTimerTrigger() {
-            const uniquePlayersCount = Object.keys(playerMap).length;
-
-            if(uniquePlayersCount >= 2 && !isTimerRunning) {
-                isTimerRunning = true;
-                timerInterval = setInterval(() => {
-                    timerSeconds--;
-                    document.getElementById('game-timer').innerText = timerSeconds + "s";
-
-                    if(timerSeconds <= 0) {
-                        clearInterval(timerInterval);
-                        alert("ጨዋታው ተጀምሯል! መልካም ዕድል!");
-                    }
-                }, 1000);
-            }
-        }
-
-        // Quick Lucky Number Selection
-        function selectLuckyNumber() {
-            const input = document.getElementById('lucky-num');
-            const num = parseInt(input.value);
-
-            if(!num || num < 1 || num > 600) {
-                alert("እባክዎን ከ 1 እስከ 600 ቁጥር ያስገቡ!");
-                return;
-            }
-
-            handleCardSelection(num);
-            
-            // Scroll directly to the chosen card
-            const targetBtn = document.getElementById('card-btn-' + num);
-            if(targetBtn) {
-                targetBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            input.value = "";
-        }
-
-        // System Auto-Select Card
-        function autoSelectCard() {
-            if(myCards.length >= MAX_CARDS_PER_PLAYER) {
-                alert(`በአንድ ጨዋታ እስከ ${MAX_CARDS_PER_PLAYER} ካርቴላ ብቻ መያዝ ይችላሉ!`);
-                return;
-            }
-
-            let freeCards = [];
-            for(let i = 1; i <= 600; i++) {
-                if(!takenCardsMap[i]) {
-                    freeCards.push(i);
-                }
-            }
-
-            if(freeCards.length === 0) {
-                alert("ሁሉም 600 ካርቴላዎች ተይዘዋል!");
-                return;
-            }
-
-            const randomCard = freeCards[Math.floor(Math.random() * freeCards.length)];
-            handleCardSelection(randomCard);
-
-            const targetBtn = document.getElementById('card-btn-' + randomCard);
-            if(targetBtn) {
-                targetBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-
-        // Show Taken Cards Modal / Info
-        function showTakenCardsInfo() {
-            const takenCards = Object.keys(takenCardsMap);
-            if(takenCards.length === 0) {
-                alert("እስካሁን ምንም የተያዘ ካርቴላ የለም!");
-                return;
-            }
-
-            let summary = `📋 የተያዙ ካርቴላዎች ዝርዝር (አጠቃላይ: ${takenCards.length})\n\n`;
-            for(let player in playerMap) {
-                summary += `👤 ተጫዋች [${player}]: ካርቴላዎች ${playerMap[player].join(', ')}\n`;
-            }
-
-            alert(summary);
+        function claimBingo(cardNum) {
+            alert(`🎉 BINGO! በካርቴላ #${cardNum} ቢንጎ ብለዋል! ሲስተሙ እያረጋገጠ ነው...`);
         }
 
         function leaveRoom() {
-            if(myCards.length > 0) {
-                if(!confirm("ከጨዋታው ከወጡ የያዟቸው ካርቴላዎች ይለቀቃሉ። እርግጠኛ ነዎት?")) {
-                    return;
-                }
-                // Refund
-                myBalance += myCards.length * currentRoomPrice;
-                myCards.forEach(c => {
-                    delete takenCardsMap[c];
-                });
-                delete playerMap[myUserId];
-                myCards = [];
-            }
-
-            document.getElementById('user-balance').innerText = myBalance + " ETB";
             document.getElementById('p-game').classList.remove('active');
             document.getElementById('p-rooms').classList.add('active');
         }
 
         function refreshGrid() {
-            updateGridVisuals();
+            renderMainGrid();
+            renderMySelectedCards();
             updateStatsAndDerash();
         }
 
