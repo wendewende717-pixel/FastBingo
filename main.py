@@ -84,18 +84,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"💰 **የአካውንትዎ መረጃ:-** '👤 ፕሮፋይል / ቀሪ ሂሳብ' የሚለውን በመጫን ይመልከቱ።"
     )
 
-    # ቴሌግራም ላይ ባነሩ በትክክል እንዲታይ የሚሰራ ምስል
-    banner_url = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=800"
+    # ያንተ የፕሮጀክትህ ኦፊሺያል Fast Bingo ሎጎ ሊንክ
+    logo_url = "https://raw.githubusercontent.com/wendewende717-pixel/FastBingo/main/static/images/logo.png"
 
     try:
         await update.message.reply_photo(
-            photo=banner_url,
+            photo=logo_url,
             caption=caption_text,
             reply_markup=reply_markup,
             parse_mode="Markdown"
         )
     except Exception as e:
-        logging.error(f"Error sending photo: {e}")
+        # ፎቶው ካልወጣ በፅሁፍ ብቻ ይልካል
         await update.message.reply_text(
             text=caption_text,
             reply_markup=reply_markup,
