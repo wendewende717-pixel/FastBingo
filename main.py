@@ -9,6 +9,9 @@ logging.basicConfig(level=logging.INFO)
 WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://my-fastbingo-app.onrender.com")
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 
+# የ Fast Bingo ሎጎ ምስል URL
+LOGO_URL = "https://raw.githubusercontent.com/wendewende717-pixel/FastBingo/main/static/logo.png"
+
 app = FastAPI()
 telegram_app = None
 
@@ -45,7 +48,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"💰 **የአካውንትዎ መረጃ፦** '**👤 ፕሮፋይል / ቀሪ ሂሳብ**' የሚለውን በመጫን ይመልከቱ።"
     )
     
-    await update.message.reply_text(caption, reply_markup=reply_markup, parse_mode="Markdown")
+    try:
+        # ሎጎውን ከነ ሙሉ መልእክቱ ይልካል
+        await update.message.reply_photo(photo=LOGO_URL, caption=caption, reply_markup=reply_markup, parse_mode="Markdown")
+    except Exception as e:
+        logging.error(f"Error sending photo: {e}")
+        await update.message.reply_text(caption, reply_markup=reply_markup, parse_mode="Markdown")
 
 @app.on_event("startup")
 async def startup_event():
@@ -55,7 +63,6 @@ async def startup_event():
         telegram_app.add_handler(CommandHandler("start", start))
         await telegram_app.initialize()
         await telegram_app.start()
-        # Webhook ማሰር (Conflict ኤረርን በቋሚነት ያስቀረዋል)
         webhook_url = f"{WEBAPP_URL}/webhook"
         await telegram_app.bot.set_webhook(url=webhook_url, drop_pending_updates=True)
         logging.info(f"Webhook set to {webhook_url}")
@@ -69,4 +76,4 @@ async def webhook_handler(request: Request):
 
 @app.get("/")
 async def root():
-    return {"message": "Fast Bingo Bot and WebApp is running smoothly via Webhook!"}
+    return {"message": "Fast Bingo Bot and WebApp is running smoothly with Logo Banner!"}
