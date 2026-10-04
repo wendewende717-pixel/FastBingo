@@ -1,6 +1,5 @@
 import os
 import logging
-import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -29,7 +28,7 @@ if TOKEN:
         inline_markup = InlineKeyboardMarkup(inline_keyboard)
 
         reply_keyboard = [
-            [KeyboardButton("🕹️ ቢንጎ ተጫወት (Play Bingo)", web_app={"url": WEBAPP_URL})],
+            [KeyboardButton("🕹️️ ቢንጎ ተጫወት (Play Bingo)", web_app={"url": WEBAPP_URL})],
             [KeyboardButton("👤 ፕሮፋይል / ቀሪ ሂሳብ"), KeyboardButton("💳 ብር መሙያ (Deposit)")],
             [KeyboardButton("🤑 ብር ማውጫ (Withdraw)"), KeyboardButton("🎁 ብር ማስተላለፊያ")],
             [KeyboardButton("📖 መመሪያ (Instruction)"), KeyboardButton("☎ እገዛ (Support)")],
@@ -54,8 +53,9 @@ async def lifespan(app: FastAPI):
     if tg_app:
         await tg_app.initialize()
         await tg_app.start()
-        await tg_app.updater.start_polling()
-        print("Bot Polling Started Successfully!")
+        # drop_pending_updates=True በማድረግ የድሮ ግጭቶችንና የቀሩ ጥያቄዎችን ያጸዳል
+        await tg_app.updater.start_polling(drop_pending_updates=True)
+        print("Bot Started Successfully!")
     yield
     if tg_app:
         await tg_app.updater.stop()
