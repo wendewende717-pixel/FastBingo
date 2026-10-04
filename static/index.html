@@ -1,353 +1,642 @@
 <!DOCTYPE html>
 <html lang="am">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fast Bingo NextGen Pro</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
-    body { background-color: #0b132b; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; }
-    
-    /* Header */
-    .header { background: #1c2541; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3a506b; }
-    .user-info { display: flex; align-items: center; gap: 10px; }
-    .user-name { font-weight: bold; font-size: 16px; color: #ffffff; }
-    .balance-badge { background: #00b4d8; color: #000; font-weight: bold; padding: 6px 14px; border-radius: 20px; font-size: 15px; box-shadow: 0 0 10px rgba(0,180,216,0.5); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Fast Bingo NextGen Pro</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --accent-blue: #0284c7;
+            --my-card-blue: #2563eb;
+            --taken-card-red: #dc2626;
+            --free-card-bg: #334155;
+            --text-gold: #fbbf24;
+        }
 
-    /* Views Container */
-    .container { padding: 15px; flex: 1; display: flex; flex-direction: column; }
-    .view { display: none; }
-    .view.active { display: flex; flex-direction: column; gap: 15px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
 
-    /* Room Selection Grid */
-    .room-title { text-align: center; color: #ffb703; font-size: 20px; margin-bottom: 10px; font-weight: bold; }
-    .room-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .room-card { background: #1c2541; border: 2px solid #3a506b; border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; }
-    .room-card:active { transform: scale(0.97); border-color: #00b4d8; }
-    .room-card h3 { color: #ffb703; font-size: 18px; margin-bottom: 5px; }
-    .room-card .price { color: #00b4d8; font-size: 18px; font-weight: bold; }
-    .room-card.vip { grid-column: span 2; background: linear-gradient(135deg, #2b1055, #7597de); border: 2px solid #ffd700; }
-    .room-card.vip h3 { color: #ffd700; }
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-    /* Game Top Bar Stats */
-    .game-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #1c2541; padding: 8px; border-radius: 10px; text-align: center; border: 1px solid #3a506b; }
-    .stat-box { background: #0b132b; padding: 6px 2px; border-radius: 6px; }
-    .stat-label { font-size: 10px; color: #8d99ae; font-weight: bold; }
-    .stat-value { font-size: 13px; font-weight: bold; color: #00b4d8; margin-top: 2px; }
-    .stat-value.timer { color: #ffb703; }
+        /* NAVBAR */
+        .header {
+            background-color: #1e293b;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #334155;
+        }
 
-    /* Filter Controls */
-    .filter-bar { display: flex; gap: 6px; }
-    .filter-btn { flex: 1; padding: 8px; background: #1c2541; border: 1px solid #3a506b; color: #fff; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
-    .filter-btn.active { background: #00b4d8; color: #000; border-color: #00b4d8; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    /* Legend Color Indicator */
-    .legend-bar { display: flex; justify-content: space-around; background: #1c2541; padding: 6px; border-radius: 6px; font-size: 11px; }
-    .legend-item { display: flex; align-items: center; gap: 5px; }
-    .dot { width: 12px; height: 12px; border-radius: 3px; }
-    .dot.free { background: #3a506b; }
-    .dot.others { background: #d90429; }
-    .dot.mine { background: #0077b6; }
+        .balance-badge {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+        }
 
-    /* 600 Cartela Grid Container */
-    .cartela-grid-container { height: 320px; overflow-y: auto; background: #1c2541; border-radius: 10px; padding: 8px; border: 1px solid #3a506b; }
-    .cartela-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
-    .cartela-btn { aspect-ratio: 1; background: #3a506b; border: none; border-radius: 6px; color: #fff; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .cartela-btn.mine { background: #0077b6 !important; color: #fff; border: 2px solid #90e0ef; }
-    .cartela-btn.others { background: #d90429 !important; color: #fff; cursor: not-allowed; }
+        /* PAGES */
+        .page {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            padding: 10px;
+            height: calc(100vh - 55px);
+            overflow-y: auto;
+        }
 
-    /* Warning Overlay Box */
-    .warning-toast { display: none; background: #d90429; color: #fff; text-align: center; padding: 10px; font-weight: bold; border-radius: 8px; font-size: 13px; animation: shake 0.3s ease-in-out; }
-    @keyframes shake { 0%{transform: translateX(0);} 25%{transform: translateX(-5px);} 50%{transform: translateX(5px);} 75%{transform: translateX(-5px);} 100%{transform: translateX(0);} }
+        .page.active {
+            display: flex;
+        }
 
-    /* Bottom Action Controls */
-    .action-bar { display: flex; gap: 8px; margin-top: auto; }
-    .action-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; }
-    .btn-leave { background: #ef233c; color: #fff; }
-    .btn-refresh { background: #ffb703; color: #000; }
-    .btn-auto { background: #38b000; color: #fff; }
-  </style>
+        /* ROOM SELECTION PAGE */
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+            padding-bottom: 20px;
+        }
+
+        .room-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 2px solid #38bdf8;
+            border-radius: 12px;
+            padding: 18px 8px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .room-card.vip {
+            border: 2px solid var(--text-gold);
+            background: linear-gradient(145deg, #312e81, #1e1b4b);
+            grid-column: span 2;
+        }
+
+        .room-card:active {
+            transform: scale(0.97);
+        }
+
+        .room-title {
+            color: var(--text-gold);
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .room-price {
+            font-size: 20px;
+            margin-top: 6px;
+            color: #38bdf8;
+            font-weight: 800;
+        }
+
+        .room-card.vip .room-price {
+            color: var(--text-gold);
+        }
+
+        /* GAME BOARD PAGE */
+        .game-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            background: #1e293b;
+            padding: 6px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .stat-box {
+            background: #0f172a;
+            padding: 4px 2px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: #94a3b8;
+            display: block;
+        }
+
+        .stat-val {
+            font-size: 11px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .legend-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #1e293b;
+            padding: 5px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        /* ACTION INPUT & BUTTONS BAR */
+        .quick-action-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .lucky-input {
+            width: 110px;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .btn-quick {
+            flex: 1;
+            padding: 6px;
+            border-radius: 6px;
+            border: none;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-lucky { background-color: #0284c7; }
+        .btn-auto-pick { background-color: #16a34a; }
+        .btn-taken-info { background-color: #d97706; }
+
+        /* FULL SCREEN BINGO CARDS GRID (600 CARDS) */
+        .cards-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            background: #1e293b;
+            padding: 6px;
+            border-radius: 8px;
+            overflow-y: auto;
+            max-height: 50vh;
+        }
+
+        .bingo-card-btn {
+            background-color: var(--free-card-bg);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+            cursor: pointer;
+        }
+
+        .bingo-card-btn.taken {
+            background-color: var(--taken-card-red) !important;
+            color: #ffffff;
+        }
+
+        .bingo-card-btn.mine {
+            background-color: var(--my-card-blue) !important;
+            color: #ffffff;
+            border: 2px solid #60a5fa;
+            box-shadow: 0 0 6px #2563eb;
+        }
+
+        /* CONTROL FOOTER */
+        .game-footer {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            margin-top: 6px;
+            padding-bottom: 4px;
+        }
+
+        .btn-action {
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-leave { background-color: #ef4444; }
+        .btn-refresh { background-color: #f59e0b; }
+        .btn-auto { background-color: #10b981; }
+    </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="user-info">
-      <div class="user-name" id="userName">Wende</div>
-    </div>
-    <div class="balance-badge" id="userBalance">50 ETB</div>
-  </div>
-
-  <div class="container">
-    <!-- ROOM SELECTION VIEW -->
-    <div id="roomView" class="view active">
-      <div class="room-title">🎯 የጨዋታ ክፍል ይምረጡ</div>
-      <div class="room-grid">
-        <div class="room-card" onclick="selectRoom(5)">
-          <h3>ክፍል 5</h3>
-          <div class="price">5 ETB</div>
+    <!-- NAVBAR -->
+    <div class="header">
+        <div class="user-info">
+            <span id="user-name" style="font-weight: bold;">ተጫዋች</span>
         </div>
-        <div class="room-card" onclick="selectRoom(10)">
-          <h3>ክፍል 10</h3>
-          <div class="price">10 ETB</div>
-        </div>
-        <div class="room-card" onclick="selectRoom(15)">
-          <h3>ክፍል 15</h3>
-          <div class="price">15 ETB</div>
-        </div>
-        <div class="room-card" onclick="selectRoom(20)">
-          <h3>ክፍል 20</h3>
-          <div class="price">20 ETB</div>
-        </div>
-        <div class="room-card" onclick="selectRoom(25)">
-          <h3>ክፍል 25</h3>
-          <div class="price">25 ETB</div>
-        </div>
-        <div class="room-card" onclick="selectRoom(50)">
-          <h3>ክፍል 50</h3>
-          <div class="price">50 ETB</div>
-        </div>
-        <div class="room-card" onclick="selectRoom(100)">
-          <h3>ክፍል 100</h3>
-          <div class="price">100 ETB</div>
-        </div>
-        <div class="room-card" onclick="selectRoom(200)">
-          <h3>ክፍል 200</h3>
-          <div class="price">200 ETB</div>
-        </div>
-        <div class="room-card vip" onclick="selectRoom(500)">
-          <h3>👑 VIP ቪአይፒ ክፍል</h3>
-          <div class="price">500 ETB</div>
-        </div>
-      </div>
+        <div class="balance-badge" id="user-balance">50 ETB</div>
     </div>
 
-    <!-- CARTELA SELECTION / GAME VIEW -->
-    <div id="gameView" class="view">
-      <!-- Game Top Stats Bar -->
-      <div class="game-stats">
-        <div class="stat-box">
-          <div class="stat-label">GAME ID</div>
-          <div class="stat-value" id="gameId">#FB-5-102</div>
+    <!-- 1. ROOM SELECTION PAGE -->
+    <div id="p-rooms" class="page active">
+        <h3 style="text-align: center; color: var(--text-gold); margin: 5px 0 10px 0;">🎯 የጨዋታ ክፍል ይምረጡ</h3>
+        <div class="rooms-grid">
+            <div class="room-card" onclick="selectRoom('FB-5', 5)">
+                <div class="room-title">ክፍል 5</div>
+                <div class="room-price">5 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom('FB-10', 10)">
+                <div class="room-title">ክፍል 10</div>
+                <div class="room-price">10 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom('FB-15', 15)">
+                <div class="room-title">ክፍል 15</div>
+                <div class="room-price">15 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom('FB-20', 20)">
+                <div class="room-title">ክፍል 20</div>
+                <div class="room-price">20 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom('FB-25', 25)">
+                <div class="room-title">ክፍል 25</div>
+                <div class="room-price">25 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom('FB-50', 50)">
+                <div class="room-title">ክፍል 50</div>
+                <div class="room-price">50 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom('FB-100', 100)">
+                <div class="room-title">ክፍል 100</div>
+                <div class="room-price">100 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom('FB-200', 200)">
+                <div class="room-title">ክፍል 200</div>
+                <div class="room-price">200 ETB</div>
+            </div>
+            <!-- VIP ROOM -->
+            <div class="room-card vip" onclick="selectRoom('FB-VIP', 500)">
+                <div class="room-title">👑 VIP ቪአይፒ ክፍል</div>
+                <div class="room-price">500 ETB</div>
+            </div>
         </div>
-        <div class="stat-box">
-          <div class="stat-label">PLAYERS</div>
-          <div class="stat-value" id="playerCount">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">BET</div>
-          <div class="stat-value" id="betAmount">5 ETB</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">DERASH</div>
-          <div class="stat-value" id="derashAmount">0 ETB</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">TIMER</div>
-          <div class="stat-value timer" id="timerValue">60s</div>
-        </div>
-      </div>
-
-      <!-- Warning Toast -->
-      <div id="warningToast" class="warning-toast"></div>
-
-      <!-- Filter Controls -->
-      <div class="filter-bar">
-        <div class="filter-btn active">ቁጥር (1-600)</div>
-        <div class="filter-btn">ምረጡ</div>
-        <div class="filter-btn">ሲስተሙ ይምረጡ</div>
-        <div class="filter-btn" id="myCartelasTab">የተያዙ (0)</div>
-      </div>
-
-      <!-- Legend Color Bar -->
-      <div class="legend-bar">
-        <div class="legend-item"><div class="dot free"></div> ክፍት</div>
-        <div class="legend-item"><div class="dot others"></div> የተያዘ (ቀይ)</div>
-        <div class="legend-item"><div class="dot mine"></div> የኔ ካርቴላ (ሰማያዊ)</div>
-      </div>
-
-      <!-- 600 Cartela Grid Area -->
-      <div class="cartela-grid-container">
-        <div class="cartela-grid" id="cartelaGrid"></div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="action-bar">
-        <button class="action-btn btn-leave" onclick="leaveRoom()">Leave</button>
-        <button class="action-btn btn-refresh" onclick="refreshGrid()">Refresh</button>
-        <button class="action-btn btn-auto">Automatic: ON</button>
-      </div>
     </div>
-  </div>
 
-  <script>
-    const tg = window.Telegram ? window.Telegram.WebApp : null;
-    if (tg) tg.expand();
+    <!-- 2. GAME BOARD PAGE -->
+    <div id="p-game" class="page">
+        <!-- STATS BAR -->
+        <div class="game-stats-bar">
+            <div class="stat-box">
+                <span class="stat-label">GAME ID</span>
+                <span class="stat-val" id="game-id">#FB001</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">PLAYERS</span>
+                <span class="stat-val" id="game-players">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">BET</span>
+                <span class="stat-val" id="game-bet">5 ETB</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">DERASH</span>
+                <span class="stat-val" id="game-derash">0 ETB</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">TIMER</span>
+                <span class="stat-val" id="game-timer" style="color: #f59e0b;">60s</span>
+            </div>
+        </div>
 
-    let userBalance = 50; 
-    let currentBet = 5;
-    let mySelectedCartelas = [];
-    let otherPlayersCount = 0;
-    let totalCartelasBoughtInRoom = 0;
-    let timerSeconds = 60;
-    let timerInterval = null;
-    let isTimerRunning = false;
+        <!-- QUICK ACTION BAR -->
+        <div class="quick-action-bar">
+            <input type="number" id="lucky-num" class="lucky-input" placeholder="ቁጥር (1-600)" min="1" max="600">
+            <button class="btn-quick btn-lucky" onclick="selectLuckyNumber()">ምረጥ</button>
+            <button class="btn-quick btn-auto-pick" onclick="autoSelectCard()">ሲስተሙ ይምረጥ</button>
+            <button class="btn-quick btn-taken-info" onclick="showTakenCardsInfo()">የተያዙ (0)</button>
+        </div>
 
-    let occupiedByOthers = new Set();
+        <!-- LEGEND GUIDE -->
+        <div class="legend-bar">
+            <div class="legend-item">
+                <div class="color-dot" style="background: var(--free-card-bg);"></div>
+                <span>ክፍት</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-dot" style="background: var(--taken-card-red);"></div>
+                <span>የተያዘ</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-dot" style="background: var(--my-card-blue);"></div>
+                <span>የኔ ካርቴላ</span>
+            </div>
+        </div>
 
-    function selectRoom(bet) {
-      currentBet = bet;
-      document.getElementById('betAmount').innerText = bet + " ETB";
-      document.getElementById('gameId').innerText = "#FB-" + bet + "-" + Math.floor(1000 + Math.random() * 9000);
-      
-      document.getElementById('roomView').classList.remove('active');
-      document.getElementById('gameView').classList.add('active');
-      
-      resetGameData();
-      renderCartelaGrid();
-    }
+        <!-- FULL SCREEN CARDS GRID (600) -->
+        <div class="cards-container" id="cards-grid"></div>
 
-    function resetGameData() {
-      mySelectedCartelas = [];
-      occupiedByOthers.clear();
-      otherPlayersCount = 0;
-      totalCartelasBoughtInRoom = 0;
-      timerSeconds = 60;
-      isTimerRunning = false;
-      clearInterval(timerInterval);
-      
-      document.getElementById('timerValue').innerText = "60s";
-      document.getElementById('playerCount').innerText = "0";
-      document.getElementById('derashAmount').innerText = "0 ETB";
-      document.getElementById('myCartelasTab').innerText = "የተያዙ (0)";
-    }
+        <!-- FOOTER -->
+        <div class="game-footer">
+            <button class="btn-action btn-leave" onclick="leaveRoom()">Leave</button>
+            <button class="btn-action btn-refresh" onclick="refreshGrid()">Refresh</button>
+            <button class="btn-action btn-auto">Automatic: ON</button>
+        </div>
+    </div>
 
-    function renderCartelaGrid() {
-      const grid = document.getElementById('cartelaGrid');
-      grid.innerHTML = "";
+    <script>
+        const tg = window.Telegram ? window.Telegram.WebApp : null;
+        let myBalance = 50.0;
+        let currentRoomPrice = 0;
+        let myUserId = "Me";
 
-      for (let i = 1; i <= 600; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'cartela-btn';
-        btn.innerText = i;
+        // Game State Variables
+        let myCards = [];
+        let takenCardsMap = {}; // Example: { 10: "Player1", 12: "Player1", 45: "Player2" }
+        let playerMap = {}; // Unique Player Tracking: { "Player1": ["Card10", "Card12"], "Player2": ["Card45"] }
+        
+        let timerSeconds = 60;
+        let timerInterval = null;
+        let isTimerRunning = false;
+        const MAX_CARDS_PER_PLAYER = 6;
 
-        if (mySelectedCartelas.includes(i)) {
-          btn.classList.add('mine');
-        } else if (occupiedByOthers.has(i)) {
-          btn.classList.add('others');
+        function initApp() {
+            if(tg) {
+                tg.expand();
+                if(tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
+                    myUserId = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || "Me";
+                }
+            }
+            renderCardsGrid();
         }
 
-        btn.onclick = () => toggleCartela(i);
-        grid.appendChild(btn);
-      }
-    }
+        function selectRoom(roomId, price) {
+            if(myBalance < price) {
+                alert("በቂ ቀሪ ሂሳብ የሎትም! እባክዎን አስቀድመው ብር ያስገቡ።");
+                return;
+            }
+            
+            currentRoomPrice = price;
+            
+            document.getElementById('game-id').innerText = "#" + roomId + "-" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('game-bet').innerText = price + " ETB";
 
-    function triggerWarning(msg) {
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200, 100, 300]);
-      }
-      
-      const toast = document.getElementById('warningToast');
-      toast.innerText = msg;
-      toast.style.display = 'block';
-      
-      setTimeout(() => {
-        toast.style.display = 'none';
-      }, 3000);
-    }
-
-    function toggleCartela(num) {
-      if (occupiedByOthers.has(num)) {
-        triggerWarning("ይህ ካርቴላ በሌላ ተጫዋች የተያዘ ነው!");
-        return;
-      }
-
-      if (mySelectedCartelas.includes(num)) {
-        mySelectedCartelas = mySelectedCartelas.filter(c => c !== num);
-        totalCartelasBoughtInRoom--;
-        updateStats();
-        renderCartelaGrid();
-        return;
-      }
-
-      if (mySelectedCartelas.length >= 6) {
-        triggerWarning("⚠️ ማስጠንቀቂያ፦ በአንድ ጊዜ ከ 6 ካርቴላ በላይ መያዝ አይችሉም!");
-        return;
-      }
-
-      if (userBalance < currentBet) {
-        triggerWarning("⚠️ ሂሳብዎ በቂ አይደለም! እባክዎን አስቀድመው ሂሳብዎን ይሙሉ (Deposit)።");
-        return;
-      }
-
-      mySelectedCartelas.push(num);
-      totalCartelasBoughtInRoom++;
-
-      if (otherPlayersCount === 0 && mySelectedCartelas.length === 1) {
-        setTimeout(() => {
-          simulateOtherPlayer();
-        }, 1500);
-      }
-
-      updateStats();
-      renderCartelaGrid();
-    }
-
-    function simulateOtherPlayer() {
-      otherPlayersCount = 1; 
-      for (let k = 0; k < 2; k++) {
-        let rand = Math.floor(Math.random() * 600) + 1;
-        if (!mySelectedCartelas.includes(rand)) {
-          occupiedByOthers.add(rand);
-          totalCartelasBoughtInRoom++;
+            document.getElementById('p-rooms').classList.remove('active');
+            document.getElementById('p-game').classList.add('active');
+            
+            updateStatsAndDerash();
         }
-      }
-      
-      startTimer();
-      updateStats();
-      renderCartelaGrid();
-    }
 
-    function updateStats() {
-      let totalPlayers = 0;
-      if (mySelectedCartelas.length > 0) totalPlayers += 1;
-      totalPlayers += otherPlayersCount;
-      
-      document.getElementById('playerCount').innerText = totalPlayers;
+        // Render 1 to 600 Bingo Cards
+        function renderCardsGrid() {
+            const grid = document.getElementById('cards-grid');
+            grid.innerHTML = "";
 
-      let totalPool = totalCartelasBoughtInRoom * currentBet;
-      let derash = Math.floor(totalPool * 0.8);
-      document.getElementById('derashAmount').innerText = derash + " ETB";
+            for(let i = 1; i <= 600; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'bingo-card-btn';
+                btn.id = 'card-btn-' + i;
+                btn.innerText = i;
 
-      document.getElementById('myCartelasTab').innerText = `የተያዙ (${mySelectedCartelas.length})`;
-    }
+                btn.onclick = function() {
+                    handleCardSelection(i);
+                };
 
-    function startTimer() {
-      if (isTimerRunning) return;
-      isTimerRunning = true;
-      timerSeconds = 60;
-
-      timerInterval = setInterval(() => {
-        timerSeconds--;
-        document.getElementById('timerValue').innerText = timerSeconds + "s";
-
-        if (timerSeconds <= 0) {
-          clearInterval(timerInterval);
-          alert("⏱️ ሰዓት አብቅቷል! ጨዋታው እና የእጣ ቁጥሮች መውጣት ይጀምራሉ።");
+                grid.appendChild(btn);
+            }
         }
-      }, 1000);
-    }
 
-    function leaveRoom() {
-      clearInterval(timerInterval);
-      document.getElementById('gameView').classList.remove('active');
-      document.getElementById('roomView').classList.add('active');
-    }
+        function handleCardSelection(cardNum) {
+            // 1. If taken by someone else
+            if(takenCardsMap[cardNum] && takenCardsMap[cardNum] !== myUserId) {
+                alert(`ካርቴላ #${cardNum} በሌላ ተጫዋች (${takenCardsMap[cardNum]}) ተይዟል!`);
+                return;
+            }
 
-    function refreshGrid() {
-      renderCartelaGrid();
-    }
-  </script>
+            // 2. If already selected by me (Deselect)
+            if(myCards.includes(cardNum)) {
+                myCards = myCards.filter(c => c !== cardNum);
+                delete takenCardsMap[cardNum];
+                
+                // Remove from player map
+                if(playerMap[myUserId]) {
+                    playerMap[myUserId] = playerMap[myUserId].filter(c => c !== cardNum);
+                    if(playerMap[myUserId].length === 0) {
+                        delete playerMap[myUserId];
+                    }
+                }
+
+                myBalance += currentRoomPrice;
+            } else {
+                // 3. New selection (Max 6 limit check)
+                if(myCards.length >= MAX_CARDS_PER_PLAYER) {
+                    alert(`በአንድ ጨዋታ እስከ ${MAX_CARDS_PER_PLAYER} ካርቴላ ብቻ መያዝ ይችላሉ!`);
+                    return;
+                }
+
+                if(myBalance < currentRoomPrice) {
+                    alert("ተጨማሪ ካርቴላ ለመያዝ በቂ ቀሪ ሂሳብ የሎትም!");
+                    return;
+                }
+
+                myCards.push(cardNum);
+                takenCardsMap[cardNum] = myUserId;
+
+                if(!playerMap[myUserId]) {
+                    playerMap[myUserId] = [];
+                }
+                playerMap[myUserId].push(cardNum);
+
+                myBalance -= currentRoomPrice;
+            }
+
+            document.getElementById('user-balance').innerText = myBalance + " ETB";
+            updateGridVisuals();
+            updateStatsAndDerash();
+            checkTimerTrigger();
+        }
+
+        function updateGridVisuals() {
+            for(let i = 1; i <= 600; i++) {
+                const btn = document.getElementById('card-btn-' + i);
+                if(!btn) continue;
+
+                btn.className = 'bingo-card-btn';
+
+                if(myCards.includes(i)) {
+                    btn.classList.add('mine');
+                } else if(takenCardsMap[i]) {
+                    btn.classList.add('taken');
+                }
+            }
+        }
+
+        function updateStatsAndDerash() {
+            const totalTakenCards = Object.keys(takenCardsMap).length;
+            const uniquePlayersCount = Object.keys(playerMap).length;
+
+            // 1. Update PLAYERS count (Actual Unique People, not cards count)
+            document.getElementById('game-players').innerText = uniquePlayersCount;
+
+            // 2. Calculate Derash: Total Pool = Cards * Bet, Commission = 20%, Derash = 80%
+            const totalBetPool = totalTakenCards * currentRoomPrice;
+            const derashAmount = totalBetPool * 0.80; // 20% commission deducted
+
+            document.getElementById('game-derash').innerText = derashAmount + " ETB";
+            
+            // Update quick button info
+            const btnTaken = document.querySelector('.btn-taken-info');
+            if(btnTaken) {
+                btnTaken.innerText = `የተያዙ (${totalTakenCards})`;
+            }
+        }
+
+        // Timer starts only when 2nd Player buys a card
+        function checkTimerTrigger() {
+            const uniquePlayersCount = Object.keys(playerMap).length;
+
+            if(uniquePlayersCount >= 2 && !isTimerRunning) {
+                isTimerRunning = true;
+                timerInterval = setInterval(() => {
+                    timerSeconds--;
+                    document.getElementById('game-timer').innerText = timerSeconds + "s";
+
+                    if(timerSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        alert("ጨዋታው ተጀምሯል! መልካም ዕድል!");
+                    }
+                }, 1000);
+            }
+        }
+
+        // Quick Lucky Number Selection
+        function selectLuckyNumber() {
+            const input = document.getElementById('lucky-num');
+            const num = parseInt(input.value);
+
+            if(!num || num < 1 || num > 600) {
+                alert("እባክዎን ከ 1 እስከ 600 ቁጥር ያስገቡ!");
+                return;
+            }
+
+            handleCardSelection(num);
+            
+            // Scroll directly to the chosen card
+            const targetBtn = document.getElementById('card-btn-' + num);
+            if(targetBtn) {
+                targetBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            input.value = "";
+        }
+
+        // System Auto-Select Card
+        function autoSelectCard() {
+            if(myCards.length >= MAX_CARDS_PER_PLAYER) {
+                alert(`በአንድ ጨዋታ እስከ ${MAX_CARDS_PER_PLAYER} ካርቴላ ብቻ መያዝ ይችላሉ!`);
+                return;
+            }
+
+            let freeCards = [];
+            for(let i = 1; i <= 600; i++) {
+                if(!takenCardsMap[i]) {
+                    freeCards.push(i);
+                }
+            }
+
+            if(freeCards.length === 0) {
+                alert("ሁሉም 600 ካርቴላዎች ተይዘዋል!");
+                return;
+            }
+
+            const randomCard = freeCards[Math.floor(Math.random() * freeCards.length)];
+            handleCardSelection(randomCard);
+
+            const targetBtn = document.getElementById('card-btn-' + randomCard);
+            if(targetBtn) {
+                targetBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Show Taken Cards Modal / Info
+        function showTakenCardsInfo() {
+            const takenCards = Object.keys(takenCardsMap);
+            if(takenCards.length === 0) {
+                alert("እስካሁን ምንም የተያዘ ካርቴላ የለም!");
+                return;
+            }
+
+            let summary = `📋 የተያዙ ካርቴላዎች ዝርዝር (አጠቃላይ: ${takenCards.length})\n\n`;
+            for(let player in playerMap) {
+                summary += `👤 ተጫዋች [${player}]: ካርቴላዎች ${playerMap[player].join(', ')}\n`;
+            }
+
+            alert(summary);
+        }
+
+        function leaveRoom() {
+            if(myCards.length > 0) {
+                if(!confirm("ከጨዋታው ከወጡ የያዟቸው ካርቴላዎች ይለቀቃሉ። እርግጠኛ ነዎት?")) {
+                    return;
+                }
+                // Refund
+                myBalance += myCards.length * currentRoomPrice;
+                myCards.forEach(c => {
+                    delete takenCardsMap[c];
+                });
+                delete playerMap[myUserId];
+                myCards = [];
+            }
+
+            document.getElementById('user-balance').innerText = myBalance + " ETB";
+            document.getElementById('p-game').classList.remove('active');
+            document.getElementById('p-rooms').classList.add('active');
+        }
+
+        function refreshGrid() {
+            updateGridVisuals();
+            updateStatsAndDerash();
+        }
+
+        window.onload = initApp;
+    </script>
 </body>
 </html>
