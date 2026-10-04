@@ -84,23 +84,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"💰 **የአካውንትዎ መረጃ:-** '👤 ፕሮፋይል / ቀሪ ሂሳብ' የሚለውን በመጫን ይመልከቱ።"
     )
 
-    # ያንተ የፕሮጀክትህ ኦፊሺያል Fast Bingo ሎጎ ሊንክ
-    logo_url = "https://raw.githubusercontent.com/wendewende717-pixel/FastBingo/main/static/images/logo.png"
+    logo_path = "logo.jpg"
+    
+    if os.path.exists(logo_path):
+        try:
+            with open(logo_path, 'rb') as photo_file:
+                await update.message.reply_photo(
+                    photo=photo_file,
+                    caption=caption_text,
+                    reply_markup=reply_markup,
+                    parse_mode="Markdown"
+                )
+            return
+        except Exception as e:
+            logging.error(f"Error sending local photo: {e}")
 
-    try:
-        await update.message.reply_photo(
-            photo=logo_url,
-            caption=caption_text,
-            reply_markup=reply_markup,
-            parse_mode="Markdown"
-        )
-    except Exception as e:
-        # ፎቶው ካልወጣ በፅሁፍ ብቻ ይልካል
-        await update.message.reply_text(
-            text=caption_text,
-            reply_markup=reply_markup,
-            parse_mode="Markdown"
-        )
+    # Fallback to direct text if image fails
+    await update.message.reply_text(
+        text=caption_text,
+        reply_markup=reply_markup,
+        parse_mode="Markdown"
+    )
 
 def run_http_server():
     server_address = ('', 8000)
