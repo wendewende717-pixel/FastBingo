@@ -33,7 +33,6 @@
             overflow: hidden;
         }
 
-        /* NAVBAR */
         .header {
             background-color: #1e293b;
             padding: 10px 15px;
@@ -58,7 +57,6 @@
             font-size: 14px;
         }
 
-        /* PAGES */
         .page {
             display: none;
             flex: 1;
@@ -72,7 +70,6 @@
             display: flex;
         }
 
-        /* ROOM SELECTION PAGE */
         .rooms-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -118,7 +115,6 @@
             color: var(--text-gold);
         }
 
-        /* GAME BOARD PAGE */
         .game-stats-bar {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -171,7 +167,6 @@
             border-radius: 3px;
         }
 
-        /* ACTION INPUT & BUTTONS BAR */
         .quick-action-bar {
             display: flex;
             gap: 6px;
@@ -204,7 +199,6 @@
         .btn-auto-pick { background-color: #16a34a; }
         .btn-taken-info { background-color: #d97706; }
 
-        /* FULL SCREEN BINGO CARDS GRID (600 CARDS) */
         .cards-container {
             flex: 1;
             display: grid;
@@ -243,7 +237,6 @@
             box-shadow: 0 0 6px #2563eb;
         }
 
-        /* CONTROL FOOTER */
         .game-footer {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -269,7 +262,6 @@
 </head>
 <body>
 
-    <!-- NAVBAR -->
     <div class="header">
         <div class="user-info">
             <span id="user-name" style="font-weight: bold;">ተጫዋች</span>
@@ -277,7 +269,6 @@
         <div class="balance-badge" id="user-balance">50 ETB</div>
     </div>
 
-    <!-- 1. ROOM SELECTION PAGE -->
     <div id="p-rooms" class="page active">
         <h3 style="text-align: center; color: var(--text-gold); margin: 5px 0 10px 0;">🎯 የጨዋታ ክፍል ይምረጡ</h3>
         <div class="rooms-grid">
@@ -313,7 +304,6 @@
                 <div class="room-title">ክፍል 200</div>
                 <div class="room-price">200 ETB</div>
             </div>
-            <!-- VIP ROOM -->
             <div class="room-card vip" onclick="selectRoom('FB-VIP', 500)">
                 <div class="room-title">👑 VIP ቪአይፒ ክፍል</div>
                 <div class="room-price">500 ETB</div>
@@ -321,9 +311,7 @@
         </div>
     </div>
 
-    <!-- 2. GAME BOARD PAGE -->
     <div id="p-game" class="page">
-        <!-- STATS BAR -->
         <div class="game-stats-bar">
             <div class="stat-box">
                 <span class="stat-label">GAME ID</span>
@@ -347,7 +335,6 @@
             </div>
         </div>
 
-        <!-- QUICK ACTION BAR -->
         <div class="quick-action-bar">
             <input type="number" id="lucky-num" class="lucky-input" placeholder="ቁጥር (1-600)" min="1" max="600">
             <button class="btn-quick btn-lucky" onclick="selectLuckyNumber()">ምረጥ</button>
@@ -355,7 +342,6 @@
             <button class="btn-quick btn-taken-info" onclick="showTakenCardsInfo()">የተያዙ (0)</button>
         </div>
 
-        <!-- LEGEND GUIDE -->
         <div class="legend-bar">
             <div class="legend-item">
                 <div class="color-dot" style="background: var(--free-card-bg);"></div>
@@ -371,10 +357,8 @@
             </div>
         </div>
 
-        <!-- FULL SCREEN CARDS GRID (600) -->
         <div class="cards-container" id="cards-grid"></div>
 
-        <!-- FOOTER -->
         <div class="game-footer">
             <button class="btn-action btn-leave" onclick="leaveRoom()">Leave</button>
             <button class="btn-action btn-refresh" onclick="refreshGrid()">Refresh</button>
@@ -388,10 +372,9 @@
         let currentRoomPrice = 0;
         let myUserId = "Me";
 
-        // Game State Variables
         let myCards = [];
-        let takenCardsMap = {}; // Example: { 10: "Player1", 12: "Player1", 45: "Player2" }
-        let playerMap = {}; // Unique Player Tracking: { "Player1": ["Card10", "Card12"], "Player2": ["Card45"] }
+        let takenCardsMap = {};
+        let playerMap = {};
         
         let timerSeconds = 60;
         let timerInterval = null;
@@ -426,7 +409,6 @@
             updateStatsAndDerash();
         }
 
-        // Render 1 to 600 Bingo Cards
         function renderCardsGrid() {
             const grid = document.getElementById('cards-grid');
             grid.innerHTML = "";
@@ -446,18 +428,15 @@
         }
 
         function handleCardSelection(cardNum) {
-            // 1. If taken by someone else
             if(takenCardsMap[cardNum] && takenCardsMap[cardNum] !== myUserId) {
                 alert(`ካርቴላ #${cardNum} በሌላ ተጫዋች (${takenCardsMap[cardNum]}) ተይዟል!`);
                 return;
             }
 
-            // 2. If already selected by me (Deselect)
             if(myCards.includes(cardNum)) {
                 myCards = myCards.filter(c => c !== cardNum);
                 delete takenCardsMap[cardNum];
                 
-                // Remove from player map
                 if(playerMap[myUserId]) {
                     playerMap[myUserId] = playerMap[myUserId].filter(c => c !== cardNum);
                     if(playerMap[myUserId].length === 0) {
@@ -467,7 +446,6 @@
 
                 myBalance += currentRoomPrice;
             } else {
-                // 3. New selection (Max 6 limit check)
                 if(myCards.length >= MAX_CARDS_PER_PLAYER) {
                     alert(`በአንድ ጨዋታ እስከ ${MAX_CARDS_PER_PLAYER} ካርቴላ ብቻ መያዝ ይችላሉ!`);
                     return;
@@ -514,23 +492,19 @@
             const totalTakenCards = Object.keys(takenCardsMap).length;
             const uniquePlayersCount = Object.keys(playerMap).length;
 
-            // 1. Update PLAYERS count (Actual Unique People, not cards count)
             document.getElementById('game-players').innerText = uniquePlayersCount;
 
-            // 2. Calculate Derash: Total Pool = Cards * Bet, Commission = 20%, Derash = 80%
             const totalBetPool = totalTakenCards * currentRoomPrice;
-            const derashAmount = totalBetPool * 0.80; // 20% commission deducted
+            const derashAmount = totalBetPool * 0.80;
 
             document.getElementById('game-derash').innerText = derashAmount + " ETB";
             
-            // Update quick button info
             const btnTaken = document.querySelector('.btn-taken-info');
             if(btnTaken) {
                 btnTaken.innerText = `የተያዙ (${totalTakenCards})`;
             }
         }
 
-        // Timer starts only when 2nd Player buys a card
         function checkTimerTrigger() {
             const uniquePlayersCount = Object.keys(playerMap).length;
 
@@ -548,7 +522,6 @@
             }
         }
 
-        // Quick Lucky Number Selection
         function selectLuckyNumber() {
             const input = document.getElementById('lucky-num');
             const num = parseInt(input.value);
@@ -560,7 +533,6 @@
 
             handleCardSelection(num);
             
-            // Scroll directly to the chosen card
             const targetBtn = document.getElementById('card-btn-' + num);
             if(targetBtn) {
                 targetBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -568,7 +540,6 @@
             input.value = "";
         }
 
-        // System Auto-Select Card
         function autoSelectCard() {
             if(myCards.length >= MAX_CARDS_PER_PLAYER) {
                 alert(`በአንድ ጨዋታ እስከ ${MAX_CARDS_PER_PLAYER} ካርቴላ ብቻ መያዝ ይችላሉ!`);
@@ -596,7 +567,6 @@
             }
         }
 
-        // Show Taken Cards Modal / Info
         function showTakenCardsInfo() {
             const takenCards = Object.keys(takenCardsMap);
             if(takenCards.length === 0) {
@@ -617,7 +587,6 @@
                 if(!confirm("ከጨዋታው ከወጡ የያዟቸው ካርቴላዎች ይለቀቃሉ። እርግጠኛ ነዎት?")) {
                     return;
                 }
-                // Refund
                 myBalance += myCards.length * currentRoomPrice;
                 myCards.forEach(c => {
                     delete takenCardsMap[c];

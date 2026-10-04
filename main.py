@@ -11,14 +11,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     first_name = user.first_name if user else "ተጫዋች"
 
-    # Inline WebApp Button
     inline_keyboard = [
         [InlineKeyboardButton("🎯 Fast Bingo ጀምር (Play Now)", web_app={"url": WEBAPP_URL})],
         [InlineKeyboardButton("📢 ቻናል (Channel)", url="https://t.me/A_ToolsX")]
     ]
     inline_markup = InlineKeyboardMarkup(inline_keyboard)
 
-    # Reply Keyboards
     reply_keyboard = [
         [KeyboardButton("🕹️ ቢንጎ ተጫወት (Play Bingo)", web_app={"url": WEBAPP_URL})],
         [KeyboardButton("👤 ፕሮፋይል / ቀሪ ሂሳብ"), KeyboardButton("💳 ብር መሙያ (Deposit)")],

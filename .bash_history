@@ -1,77 +1,3 @@
-cat << 'EOF' > main.py
-import sqlite3
-import random
-import logging
-import uvicorn
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
-import asyncio
-import threading
-
-logging.basicConfig(level=logging.INFO)
-
-TOKEN = "8234368672:AAHaTtqt08OpQQmrDDjknqtdhH66FeF5Oss"
-ADMIN_ID = 7390194019
-
-# --- FASTAPI WEB SERVER ---
-web_app = FastAPI()
-web_app.mount("/static", StaticFiles(directory="static"), name="static")
-
-@web_app.get("/")
-async def read_root():
-    return FileResponse("static/index.html")
-
-# --- TELEGRAM BOT ---
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    
-    keyboard = [
-        [
-            InlineKeyboardButton("🎮 Play Fast Bingo (Web App)", web_app=WebAppInfo(url="https://google.com"))
-        ],
-        [
-            InlineKeyboardButton("💰 ባላንስ ማየት", callback_data="check_bal"),
-            InlineKeyboardButton("📥 ገቢ (Deposit)", callback_data="dep")
-        ]
-    ]
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(
-        f"👋 **ሰላም {user.first_name}!**\n\n"
-        "ወደ **Fast Bingo Pro WebApp** እንኳን በደህና መጡ! 🎯\n"
-        "ታች ያለውን **'Play Fast Bingo'** የሚለውን ቁልፍ በመጫን በዘመናዊ ገፅ ይጫወቱ።",
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
-    )
-
-def run_web():
-    uvicorn.run(web_app, host="0.0.0.0", port=8000, log_level="warning")
-
-def main():
-    # Start Web Server in Background Thread
-    threading.Thread(target=run_web, daemon=True).start()
-    
-    # Start Telegram Bot
-    app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    
-    print("🚀 Fast Bingo Pro WebApp Server & Bot በስኬት ስራ ጀምሯል (Port 8000)...")
-    app.run_polling()
-
-if __name__ == '__main__':
-    main()
-EOF
-
-python main.py
-pkg install python clang make -y
-pip install --upgrade pip
-pip install fastapi uvicorn requests python-telegram-bot
-python main.py
-cat << 'EOF' > main.py
-import sqlite3
 import random
 import logging
 import http.server
@@ -497,4 +423,78 @@ cd FastBingo
 nano main.py
 git add .
 git commit -m "Update main.py with live Render URL"
+git push origin main
+cd FastBingo
+git checkout main
+nano requirements.txt
+nano static/index.html
+nano main.py
+git add .
+git commit -m "Update NextGen Fast Bingo WebApp with Beteseb UI"
+git push origin main
+nano main.py
+git add .
+git commit -m "Fix URL to my-fastbingo-app and update main logic"
+git push origin main
+nano main.py
+git add .
+git commit -m "Add Share Contact registration, User Account ID and Beteseb style menu"
+git push origin main
+nano main.py
+git add .
+git commit -m "Translate all bot menu texts and buttons to Amharic"
+git push origin main
+nano main.py
+git add .
+git commit -m "Add photo banner logic and setup interactive button responses"
+git push origin main
+nano main.py
+git add .
+git commit -m "Fix image error and stabilize contact handler"
+git push origin main
+nano main.py
+git add .
+git commit -m "Add SQLite database for permanent user account IDs and balance"
+git push origin main
+nano main.py
+git add .
+git commit -m "Add photo banner header"
+git push origin main
+nano main.py
+git add .
+git commit -m "Fix deploy error and build fallback"
+git push origin main
+nano main.py
+git add .
+git commit -m "Fix permanent ID and photo banner URL"
+git push origin main
+nano main.py
+git add .
+git commit -m "Full updated main.py with direct logo URL"
+git push origin main
+mkdir -p static
+cp /sdcard/Pictures/Telegram/photo.jpg static/photo.jpg
+nano main.py
+git add .
+git commit -m "Include photo.jpg in repository for bot banner"
+git push origin main
+nano main.py
+git add .
+git commit -m "Update photo sending logic and light banner URL"
+git push origin main
+mkdir -p static
+cp /sdcard/Pictures/Telegram/logo.png.jpg static/logo.png
+termux-setup-storage
+mkdir -p static
+cp /sdcard/Pictures/Telegram/logo.png.jpg static/logo.png
+git add .
+git commit -m "Add static logo.png file"
+git push origin main
+nano main.py
+git add main.py
+git commit -m "Use local static logo.png for welcome banner"
+git push origin main
+nano main.py
+git add main.py
+git commit -m "Optimize welcome message and separate user profile"
 git push origin main
