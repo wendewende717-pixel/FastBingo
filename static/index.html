@@ -85,7 +85,7 @@
             background: linear-gradient(145deg, #1e293b, #0f172a);
             border: 2px solid #38bdf8;
             border-radius: 12px;
-            padding: 12px 8px;
+            padding: 18px 8px;
             text-align: center;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
@@ -108,8 +108,8 @@
         }
 
         .room-price {
-            font-size: 18px;
-            margin: 4px 0;
+            font-size: 20px;
+            margin-top: 6px;
             color: #38bdf8;
             font-weight: 800;
         }
@@ -243,55 +243,46 @@
         <div class="balance-badge" id="user-balance">50 ETB</div>
     </div>
 
-    <!-- 1. ROOM SELECTION PAGE -->
+    <!-- 1. ROOM SELECTION PAGE (ያለ ደራሽ ጽሁፍ) -->
     <div id="p-rooms" class="page active">
         <h3 style="text-align: center; color: var(--text-gold); margin: 5px 0 10px 0;">🎯 የጨዋታ ክፍል ይምረጡ</h3>
         <div class="rooms-grid">
             <div class="room-card" onclick="selectRoom('FB-5', 5)">
                 <div class="room-title">ክፍል 5</div>
                 <div class="room-price">5 ETB</div>
-                <small style="color: #94a3b8;">ደርሽ: 400 ETB</small>
             </div>
             <div class="room-card" onclick="selectRoom('FB-10', 10)">
                 <div class="room-title">ክፍል 10</div>
                 <div class="room-price">10 ETB</div>
-                <small style="color: #94a3b8;">ደርሽ: 800 ETB</small>
             </div>
             <div class="room-card" onclick="selectRoom('FB-15', 15)">
                 <div class="room-title">ክፍል 15</div>
                 <div class="room-price">15 ETB</div>
-                <small style="color: #94a3b8;">ደርሽ: 1,200 ETB</small>
             </div>
             <div class="room-card" onclick="selectRoom('FB-20', 20)">
                 <div class="room-title">ክፍል 20</div>
                 <div class="room-price">20 ETB</div>
-                <small style="color: #94a3b8;">ደርሽ: 1,600 ETB</small>
             </div>
             <div class="room-card" onclick="selectRoom('FB-25', 25)">
                 <div class="room-title">ክፍል 25</div>
                 <div class="room-price">25 ETB</div>
-                <small style="color: #94a3b8;">ደርሽ: 2,000 ETB</small>
             </div>
             <div class="room-card" onclick="selectRoom('FB-50', 50)">
                 <div class="room-title">ክፍል 50</div>
                 <div class="room-price">50 ETB</div>
-                <small style="color: #94a3b8;">ደርሽ: 4,000 ETB</small>
             </div>
             <div class="room-card" onclick="selectRoom('FB-100', 100)">
                 <div class="room-title">ክፍል 100</div>
                 <div class="room-price">100 ETB</div>
-                <small style="color: #94a3b8;">ደርሽ: 8,000 ETB</small>
             </div>
             <div class="room-card" onclick="selectRoom('FB-200', 200)">
                 <div class="room-title">ክፍል 200</div>
                 <div class="room-price">200 ETB</div>
-                <small style="color: #94a3b8;">ደርሽ: 16,000 ETB</small>
             </div>
             <!-- VIP ROOM -->
             <div class="room-card vip" onclick="selectRoom('FB-VIP', 500)">
                 <div class="room-title">👑 VIP ቪአይፒ ክፍል</div>
                 <div class="room-price">500 ETB</div>
-                <small style="color: #fbbf24;">ደርሽ: 40,000 ETB</small>
             </div>
         </div>
     </div>
@@ -306,7 +297,7 @@
             </div>
             <div class="stat-box">
                 <span class="stat-label">PLAYERS</span>
-                <span class="stat-val" id="game-players">595</span>
+                <span class="stat-val" id="game-players">0</span>
             </div>
             <div class="stat-box">
                 <span class="stat-label">BET</span>
@@ -314,7 +305,7 @@
             </div>
             <div class="stat-box">
                 <span class="stat-label">DERASH</span>
-                <span class="stat-val" id="game-derash">4760</span>
+                <span class="stat-val" id="game-derash">0 ETB</span>
             </div>
             <div class="stat-box">
                 <span class="stat-label">TIMER</span>
@@ -376,7 +367,7 @@
             
             document.getElementById('game-id').innerText = "#" + roomId + "-" + Math.floor(1000 + Math.random() * 9000);
             document.getElementById('game-bet').innerText = price + " ETB";
-            document.getElementById('game-derash').innerText = (price * 80) + " ETB";
+            document.getElementById('game-derash').innerText = "0 ETB";
 
             document.getElementById('p-rooms').classList.remove('active');
             document.getElementById('p-game').classList.add('active');
