@@ -1,59 +1,57 @@
 import os
 import logging
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+import threading
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 logging.basicConfig(level=logging.INFO)
 
-WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://fast-bingo-bot.onrender.com")
+WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://my-fastbingo-app.onrender.com")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
+
+class QuietHTTPRequestHandler(SimpleHTTPRequestHandler):
+    def log_message(self, format, *args):
+        pass
+
+def run_http_server():
+    port = int(os.environ.get("PORT", 8000))
+    server_address = ('', port)
+    httpd = HTTPServer(server_address, QuietHTTPRequestHandler)
+    print(f"HTTP WebApp server running on port {port}...")
+    httpd.serve_forever()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     first_name = user.first_name if user else "ተጫዋች"
-
+    
     inline_keyboard = [
         [InlineKeyboardButton("🎯 Fast Bingo ጀምር (Play Now)", web_app={"url": WEBAPP_URL})],
-        [InlineKeyboardButton("📢 ቻናል (Channel)", url="https://t.me/A_ToolsX")]
+        [InlineKeyboardButton("📢 ቻናል (Channel)", url="https://t.me/FastBingoApp")]
     ]
-    inline_markup = InlineKeyboardMarkup(inline_keyboard)
-
-    reply_keyboard = [
-        [KeyboardButton("🕹️ ቢንጎ ተጫወት (Play Bingo)", web_app={"url": WEBAPP_URL})],
-        [KeyboardButton("👤 ፕሮፋይል / ቀሪ ሂሳብ"), KeyboardButton("💳 ብር መሙያ (Deposit)")],
-        [KeyboardButton("🤑 ብር ማውጫ (Withdraw)"), KeyboardButton("🎁 ብር ማስተላለፊያ")],
-        [KeyboardButton("📖 መመሪያ (Instruction)"), KeyboardButton("☎ እገዛ (Support)")],
-        [KeyboardButton("🔗 ጓደኛ ይጋብዙ (Invite)"), KeyboardButton("🔄 ሪቪው")]
-    ]
-    reply_markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
-
-    welcome_text = (
-        f"🔥 እንኳን ወደ Fast Bingo NextGen Pro በደህና መጡ!\n\n"
-        f"ሰላም {first_name} 👋\n"
-        f"በኢትዮጵያ የመጀመሪያው እና ዘመናዊው የኦንላይን የቢንጎ ጨዋታ መድረክ ላይ ይገኛሉ።\n\n"
-        f"🎯 ለመጫወት፦ ከታች የሚገኘውን '🎯 ቢንጎ ተጫወት' የሚለውን ቁልፍ ይጫኑ።"
-    )
-
-    await update.message.reply_text(
-        text=welcome_text,
-        reply_markup=inline_markup
+    reply_markup = InlineKeyboardMarkup(inline_keyboard)
+    
+    caption = (
+        f"ሰላም {first_name}! 👋\n\n"
+        f"እንኳን ወደ **Fast Bingo** በሰላም መጡ! 🎲\n\n"
+        f"ከታች ያለውን **'Fast Bingo ጀምር'** የሚለውን ቁልፍ ተጭነው መጫወት ይጀምሩ።"
     )
     
-    await update.message.reply_text(
-        text="👇 ከታች ያሉትን አማራጮች ይጠቀሙ፦",
-        reply_markup=reply_markup
-    )
+    await update.message.reply_text(caption, reply_markup=reply_markup, parse_mode="Markdown")
 
 def main():
-    token = os.environ.get("BOT_TOKEN")
-    if not token:
-        print("Error: BOT_TOKEN environment variable not set.")
+    threading.Thread(target=run_http_server, daemon=True).start()
+    
+    if not BOT_TOKEN:
+        print("ERROR: BOT_TOKEN is missing!")
         return
 
-    app = Application.builder().token(token).build()
-    app.add_handler(CommandHandler("start", start))
+    application = Application.builder().token(BOT_TOKEN).build()
+    application.add_handler(CommandHandler("start", start))
     
-    print("Bot is running...")
-    app.run_polling(drop_pending_updates=True)
+    print("Bot is starting...")
+    # drop_pending_updates=True የተጋጩ ግንኙነቶችን በራሱ ያጸዳል
+    application.run_polling(drop_pending_updates=True, close_loop=False)
 
 if __name__ == "__main__":
     main()
