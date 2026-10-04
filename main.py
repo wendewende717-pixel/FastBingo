@@ -55,7 +55,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     url = get_webapp_url()
     
-    # Exactly matching your preferred full menu layout
     keyboard = [
         [InlineKeyboardButton("🎮 ቢንጎ ተጫወት (Play Bingo)", web_app=WebAppInfo(url=url))],
         [
@@ -85,16 +84,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"💰 **የአካውንትዎ መረጃ:-** '👤 ፕሮፋይል / ቀሪ ሂሳብ' የሚለውን በመጫን ይመልከቱ።"
     )
 
-    # Sending image logo with full text and keyboard buttons
-    photo_url = "https://raw.githubusercontent.com/wendewende717-pixel/FastBingo/main/logo.jpg"
+    # ቴሌግራም ላይ ባነሩ በትክክል እንዲታይ የሚሰራ ምስል
+    banner_url = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=800"
+
     try:
         await update.message.reply_photo(
-            photo=photo_url,
+            photo=banner_url,
             caption=caption_text,
             reply_markup=reply_markup,
             parse_mode="Markdown"
         )
-    except Exception:
+    except Exception as e:
+        logging.error(f"Error sending photo: {e}")
         await update.message.reply_text(
             text=caption_text,
             reply_markup=reply_markup,
