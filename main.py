@@ -1,52 +1,63 @@
 import os
-import asyncio
-import threading
-from http.server import SimpleHTTPRequestHandler, HTTPServer
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+import logging
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-TOKEN = os.getenv("BOT_TOKEN", "")
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://my-fastbingo-app.onrender.com")
+logging.basicConfig(level=logging.INFO)
 
-# --- Simple HTTP Server for Render Port Binding ---
-def run_http_server():
-    port = int(os.getenv("PORT", 8000))
-    server_address = ('', port)
-    httpd = HTTPServer(server_address, SimpleHTTPRequestHandler)
-    print(f"HTTP Web Server running on port {port}...")
-    httpd.serve_forever()
+# WebApp URL from environment or Render URL
+WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://fast-bingo-bot.onrender.com")
 
-# --- Telegram Bot Handlers ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_first_name = update.effective_user.first_name
-    
-    keyboard = [
-        [InlineKeyboardButton("🎯 Fast Bingo ጀምር (Play Now)", web_app=WebAppInfo(url=WEBAPP_URL))],
+    user = update.effective_user
+    first_name = user.first_name if user else "ተጫዋች"
+
+    # Inline WebApp Button
+    inline_keyboard = [
+        [InlineKeyboardButton("🎯 Fast Bingo ጀምር (Play Now)", web_app={"url": WEBAPP_URL})],
         [InlineKeyboardButton("📢 ቻናል (Channel)", url="https://t.me/A_ToolsX")]
     ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    inline_markup = InlineKeyboardMarkup(inline_keyboard)
+
+    # Reply Keyboards (Buttons below text area)
+    reply_keyboard = [
+        [KeyboardButton("🕹️ ቢንጎ ተጫወት (Play Bingo)", web_app={"url": WEBAPP_URL})],
+        [KeyboardButton("👤 ፕሮፋይል / ቀሪ ሂሳብ"), KeyboardButton("💳 ብር መሙያ (Deposit)")],
+        [KeyboardButton("🤑 ብር ማውጫ (Withdraw)"), KeyboardButton("🎁 ብር ማስተላለፊያ")],
+        [KeyboardButton("📖 መመሪያ (Instruction)"), KeyboardButton("☎ እገዛ (Support)")],
+        [KeyboardButton("🔗 ጓደኛ ይጋብዙ (Invite)"), KeyboardButton("🔄 ሪቪው")]
+    ]
+    reply_markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
+
+    welcome_text = (
+        f"🔥 እንኳን ወደ Fast Bingo NextGen Pro በደህና መጡ!\n\n"
+        f"ሰላም {first_name} 👋\n"
+        f"በኢትዮጵያ የመጀመሪያው እና ዘመናዊው የኦንላይን የቢንጎ ጨዋታ መድረክ ላይ ይገኛሉ።\n\n"
+        f"🎯 ለመጫወት፦ ከታች የሚገኘውን '🎯 ቢንጎ ተጫወት' የሚለውን ቁልፍ ይጫኑ።\n"
+        f"💰 የአካውንት መረጃ፦ '👤 ፕሮፋይል / ቀሪ ሂሳብ' የሚለውን በመጫን ይመልከቱ።"
+    )
 
     await update.message.reply_text(
-        f"ሰላም {user_first_name}! 👋\n\nወደ **Fast Bingo NextGen Pro** እንኳን በደህና መጡ! 🎲\n\nታች ያለውን **'Fast Bingo ጀምር'** የሚለውን በተን በመጫን መጫወት መጀመር ይችላሉ።",
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
+        text=welcome_text,
+        reply_markup=inline_markup
+    )
+    
+    await update.message.reply_text(
+        text="👇 ከታች ያሉትን አማራጮች ይጠቀሙ፦",
+        reply_markup=reply_markup
     )
 
 def main():
-    # 1. Start Web HTTP Server in separate Thread
-    threading.Thread(target=run_http_server, daemon=True).start()
+    token = os.environ.get("BOT_TOKEN")
+    if not token:
+        print("Error: BOT_TOKEN environment variable not set.")
+        return
 
-    # 2. Run Telegram Bot
-    if TOKEN:
-        app = Application.builder().token(TOKEN).build()
-        app.add_handler(CommandHandler("start", start))
-        print("Telegram Bot is running...")
-        app.run_polling()
-    else:
-        print("Warning: BOT_TOKEN environment variable not set. Running Web Server only.")
-        import time
-        while True:
-            time.sleep(3600)
+    app = Application.builder().token(token).build()
+    app.add_handler(CommandHandler("start", start))
+    
+    print("Bot is running...")
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
