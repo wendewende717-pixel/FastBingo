@@ -117,7 +117,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 class CustomHTTPRequestHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        # ገፁ ሲከፈት /static/index.html እንዲከፍት ማስተካከያ
+        if self.path == '/' or self.path == '':
+            self.path = '/static/index.html'
+        return super().do_GET()
+
     def do_POST(self):
+        from urllib.parse import urlparse
         parsed_path = urlparse(self.path)
         
         if parsed_path.path == "/api/get_profile":
