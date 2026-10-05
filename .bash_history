@@ -1,44 +1,3 @@
-import random
-import logging
-import http.server
-import socketserver
-import threading
-import json
-import urllib.parse
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
-
-logging.basicConfig(level=logging.INFO)
-
-TOKEN = "8234368672:AAHaTtqt08OpQQmrDDjknqtdhH66FeF5Oss"
-PORT = 8000
-
-# --- NATIVE WEB SERVER (NO FASTAPI / UVICORN NEEDED) ---
-class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/' or self.path == '/index.html':
-            self.path = '/static/index.html'
-        return http.server.SimpleHTTPRequestHandler.do_GET(self)
-
-def run_web_server():
-    handler = CustomHTTPRequestHandler
-    with socketserver.TCPServer(("", PORT), handler) as httpd:
-        print(f"🌐 Native WebApp Server running at http://localhost:{PORT}")
-        httpd.serve_forever()
-
-# --- TELEGRAM BOT HANDLERS ---
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    
-    # WebApp Button Configuration
-    # ለጊዜው በሙከራ ደረጃ Localhost/Google ወይም በNgrok Link ማገናኘት ይቻላል
-    keyboard = [
-        [
-            InlineKeyboardButton("🎮 Play Fast Bingo (Web App)", web_app=WebAppInfo(url="https://bingo-webapp-preview.loca.lt"))
-        ],
-        [
-            InlineKeyboardButton("💰 ባላንስ ማየት", callback_data="check_bal"),
-            InlineKeyboardButton("📥 ገቢ (Deposit)", callback_data="dep")
         ]
     ]
     
@@ -497,4 +456,45 @@ git push origin main
 nano main.py
 git add main.py
 git commit -m "Optimize welcome message and separate user profile"
+git push origin main
+nano main.py
+import os
+import logging
+from fastapi import FastAPI, Request, Response
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, ContextTypes
+# Logging setup
+logging.basicConfig(
+)
+logger = logging.getLogger(__name__)
+# Environment variables
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://my-fastbingo-app.onrender.com/static/index.html")
+LOGO_URL = "https://raw.githubusercontent.com/wendewende717-pixel/FastBingo/main/static/logo.png"
+# Initialize FastAPI app
+app = FastAPI(title="Fast Bingo Bot & WebApp")
+# Mount static folder for WebApp (HTML, CSS, JS)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+# Initialize Telegram Application
+tg_app = Application.builder().token(BOT_TOKEN).build()
+# Start Command Handler
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# Register bot handlers
+tg_app.add_handler(CommandHandler("start", start_command))
+# Application Lifecycle / Webhook Setup
+@app.on_event("startup")
+async def on_startup():
+@app.on_event("shutdown")
+async def on_shutdown():
+# Webhook Route for Telegram Updates
+@app.post("/webhook")
+async def telegram_webhook(request: Request):
+# Root Endpoint Redirect to WebApp
+@app.get("/")
+async def root():
+nano main.py
+git add main.py
+git commit -m "Fix main.py static mount"
 git push origin main
