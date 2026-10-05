@@ -1,408 +1,539 @@
 <!DOCTYPE html>
 <html lang="am">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Fast Bingo NextGen Pro</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root {
-      --bg-dark: #0f172a;
-      --card-bg: #1e293b;
-      --accent-blue: #2563eb;
-      --my-cartela: #007bff; /* ደማቅ ሰማያዊ */
-      --taken-cartela: #dc2626; /* ደማቅ ቀይ */
-      --free-cartela: #334155; /* ያልተያዘ ክፍት ካርቴላ */
-      --text-gold: #f59e0b;
-      --text-white: #ffffff;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Bingo NextGen Pro</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --accent-gold: #f59e0b;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+        }
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-white);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
+        body {
+            margin: 0;
+            padding: 10px;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
 
-    /* Top User Bar */
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 15px;
-      background: #182232;
-      border-bottom: 1px solid #334155;
-    }
-    .user-name { font-weight: bold; font-size: 16px; }
-    .balance-badge {
-      background: #10b981;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: bold;
-    }
+        /* Header Bar */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
 
-    /* Views container */
-    .view-section { display: none; padding: 15px; }
-    .view-section.active { display: block; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
 
-    /* Room Cards (ደራሽ የተሰኘው ፅሁፍ ተወግዷል) */
-    .room-title { text-align: center; color: var(--text-gold); font-size: 18px; margin-bottom: 15px; }
-    .rooms-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .room-card {
-      background: var(--card-bg);
-      border: 1px solid #3b82f6;
-      border-radius: 10px;
-      padding: 18px 10px;
-      text-align: center;
-      cursor: pointer;
-    }
-    .room-card .name { color: var(--text-gold); font-weight: bold; font-size: 16px; }
-    .room-card .price { color: #38bdf8; font-size: 20px; font-weight: bold; margin-top: 5px; }
-    .vip-card {
-      grid-column: span 2;
-      background: linear-gradient(135deg, #312e81, #1e1b4b);
-      border: 1px solid #eab308;
-    }
+        .balance-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
 
-    /* Game Header Stats Header */
-    .game-stats-header {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 4px;
-      background: #182232;
-      padding: 8px 4px;
-      border-radius: 8px;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .stat-box {
-      background: #0f172a;
-      padding: 6px 2px;
-      border-radius: 6px;
-      border: 1px solid #334155;
-    }
-    .stat-box .title { font-size: 10px; color: #94a3b8; }
-    .stat-box .val { font-size: 12px; font-weight: bold; color: var(--text-gold); }
+        /* Room Selection Cards */
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
 
-    /* Action Toolbar */
-    .action-toolbar {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-    .search-input {
-      flex: 1;
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #fff;
-      padding: 8px;
-      border-radius: 6px;
-    }
-    .btn-action {
-      background: #0284c7;
-      color: #fff;
-      border: none;
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+        .room-card {
+            background: var(--card-bg);
+            border: 2px solid var(--accent-blue);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
 
-    /* Legend */
-    .legend-bar {
-      display: flex;
-      justify-content: space-around;
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-    .legend-item { display: flex; align-items: center; gap: 4px; }
-    .dot { width: 12px; height: 12px; border-radius: 3px; }
+        .room-card:active {
+            transform: scale(0.96);
+        }
 
-    /* Grid 1-600 Cartelas */
-    .cartela-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 6px;
-      max-height: 420px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-    .cartela-btn {
-      aspect-ratio: 1;
-      background: var(--free-cartela);
-      border: 1px solid #475569;
-      color: #fff;
-      border-radius: 6px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .cartela-btn.my-selected {
-      background: var(--my-cartela) !important;
-      border-color: #60a5fa;
-      box-shadow: 0 0 8px #2563eb;
-    }
-    .cartela-btn.taken {
-      background: var(--taken-cartela) !important;
-      border-color: #f87171;
-      opacity: 0.85;
-      cursor: not-allowed;
-    }
+        .room-title {
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
 
-    /* Warning Overlay Toast */
-    .warning-toast {
-      position: fixed;
-      top: 20%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #dc2626;
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      box-shadow: 0 4px 15px rgba(220,38,38,0.5);
-      display: none;
-      z-index: 1000;
-      text-align: center;
-    }
-  </style>
+        .room-price {
+            color: #60a5fa;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        /* Game Board Area */
+        .game-header {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            background: #1e293b;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 11px;
+            margin-bottom: 12px;
+        }
+
+        .stat-box {
+            background: #0f172a;
+            padding: 6px 2px;
+            border-radius: 6px;
+        }
+
+        .stat-val {
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        /* Controls Area */
+        .controls-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .num-input {
+            flex: 1;
+            background: #1e293b;
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            color: #fff;
+            padding: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .btn {
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+        }
+
+        /* 600 Cartela Grid */
+        .cartela-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #090d16;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 15px;
+        }
+
+        .cartela-btn {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 8px 0;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .cartela-btn.selected {
+            background: var(--accent-blue);
+            box-shadow: 0 0 8px var(--accent-blue);
+        }
+
+        .cartela-btn.taken {
+            background: var(--accent-red);
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
+        /* Selected BINGO Cards Display Area (Horizontal Scroll - 2 per view) */
+        .active-cards-container {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            scroll-snap-type: x mandatory;
+            background: #050811;
+            border-radius: 12px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            margin-top: 15px;
+        }
+
+        .bingo-card {
+            flex: 0 0 calc(50% - 6px);
+            scroll-snap-align: start;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 2px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+            box-sizing: border-box;
+        }
+
+        .bingo-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 900;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .bingo-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 3px;
+            text-align: center;
+        }
+
+        .bingo-header-cell {
+            background: #334155;
+            color: var(--accent-gold);
+            font-weight: 900;
+            font-size: 11px;
+            padding: 3px 0;
+            border-radius: 3px;
+        }
+
+        .bingo-cell {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 6px 0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .bingo-cell.marked {
+            background: var(--accent-green);
+            color: #fff;
+            border-color: #059669;
+        }
+
+        .bingo-claim-btn {
+            width: 100%;
+            margin-top: 8px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 13px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
-  <!-- Warning Toast Container -->
-  <div id="warningToast" class="warning-toast"></div>
-
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <div class="user-name" id="userName">Wende</div>
-    <div class="balance-badge" id="userBalance">0 ETB</div>
-  </div>
-
-  <!-- VIEW 1: ROOM SELECTION PAGE -->
-  <div id="roomView" class="view-section active">
-    <div class="room-title">🎯 የጨዋታ ክፍል ይምረጡ</div>
-    <div class="rooms-grid">
-      <div class="room-card" onclick="enterRoom(5)">
-        <div class="name">ክፍል 5</div>
-        <div class="price">5 ETB</div>
-      </div>
-      <div class="room-card" onclick="enterRoom(10)">
-        <div class="name">ክፍል 10</div>
-        <div class="price">10 ETB</div>
-      </div>
-      <div class="room-card" onclick="enterRoom(15)">
-        <div class="name">ክፍል 15</div>
-        <div class="price">15 ETB</div>
-      </div>
-      <div class="room-card" onclick="enterRoom(20)">
-        <div class="name">ክፍል 20</div>
-        <div class="price">20 ETB</div>
-      </div>
-      <div class="room-card" onclick="enterRoom(25)">
-        <div class="name">ክፍል 25</div>
-        <div class="price">25 ETB</div>
-      </div>
-      <div class="room-card" onclick="enterRoom(50)">
-        <div class="name">ክፍል 50</div>
-        <div class="price">50 ETB</div>
-      </div>
-      <div class="room-card" onclick="enterRoom(100)">
-        <div class="name">ክፍል 100</div>
-        <div class="price">100 ETB</div>
-      </div>
-      <div class="room-card" onclick="enterRoom(200)">
-        <div class="name">ክፍል 200</div>
-        <div class="price">200 ETB</div>
-      </div>
-      <div class="room-card vip-card" onclick="enterRoom(500)">
-        <div class="name">👑 VIP ቪአይፒ ክፍል</div>
-        <div class="price">500 ETB</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- VIEW 2: GAME BOARD PAGE -->
-  <div id="gameView" class="view-section">
-    <!-- Game Header Stats -->
-    <div class="game-stats-header">
-      <div class="stat-box">
-        <div class="title">GAME ID</div>
-        <div class="val" id="gameId">#FB-5-1001</div>
-      </div>
-      <div class="stat-box">
-        <div class="title">PLAYERS</div>
-        <div class="val" id="playersCount">0</div>
-      </div>
-      <div class="stat-box">
-        <div class="title">BET</div>
-        <div class="val" id="betAmount">5 ETB</div>
-      </div>
-      <div class="stat-box">
-        <div class="title">DERASH</div>
-        <div class="val" id="derashAmount" style="color: #38bdf8;">0 ETB</div>
-      </div>
-      <div class="stat-box">
-        <div class="title">TIMER</div>
-        <div class="val" id="timerCount" style="color:#f59e0b;">60s</div>
-      </div>
+    <!-- Header Section -->
+    <div class="header-bar">
+        <div class="user-info">
+            <span id="userName">Wende</span>
+        </div>
+        <div class="balance-badge">
+            <span id="userBalance">100</span> ETB
+        </div>
     </div>
 
-    <!-- Action Toolbar -->
-    <div class="action-toolbar">
-      <input type="number" id="numInput" class="search-input" placeholder="ቁጥር (1-600)" min="1" max="600" oninput="autoSelectNumber(this.value)">
-      <button class="btn-action" onclick="autoPickBySystem()">ሲስተሙ ይምረጥልኝ</button>
-      <button class="btn-action" style="background:#eab308; color:#000;" id="selectedBtnCount">የተያዙ (0)</button>
+    <!-- Room Selection View -->
+    <div id="roomSelectionView">
+        <h3 style="text-align:center; color: var(--accent-gold); margin-bottom: 15px;">🎯 የጨዋታ ክፍል ይምረጡ</h3>
+        <div class="room-grid">
+            <div class="room-card" onclick="selectRoom(5)">
+                <div class="room-title">ክፍል 5</div>
+                <div class="room-price">5 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom(10)">
+                <div class="room-title">ክፍል 10</div>
+                <div class="room-price">10 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom(15)">
+                <div class="room-title">ክፍል 15</div>
+                <div class="room-price">15 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom(20)">
+                <div class="room-title">ክፍል 20</div>
+                <div class="room-price">20 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom(25)">
+                <div class="room-title">ክፍል 25</div>
+                <div class="room-price">25 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom(50)">
+                <div class="room-title">ክፍል 50</div>
+                <div class="room-price">50 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom(100)">
+                <div class="room-title">ክፍል 100</div>
+                <div class="room-price">100 ETB</div>
+            </div>
+            <div class="room-card" onclick="selectRoom(200)">
+                <div class="room-title">ክፍል 200</div>
+                <div class="room-price">200 ETB</div>
+            </div>
+        </div>
+        <div class="room-card" style="border-color: var(--accent-gold); background: linear-gradient(145deg, #1e293b, #312e81);" onclick="selectRoom(500)">
+            <div class="room-title" style="color:#fff;">👑 VIP ቪአይፒ ክፍል</div>
+            <div class="room-price" style="color: var(--accent-gold);">500 ETB</div>
+        </div>
     </div>
 
-    <!-- Color Legend -->
-    <div class="legend-bar">
-      <div class="legend-item"><div class="dot" style="background:var(--free-cartela);"></div> ክፍት</div>
-      <div class="legend-item"><div class="dot" style="background:var(--taken-cartela);"></div> የተያዘ (ሌሎች)</div>
-      <div class="legend-item"><div class="dot" style="background:var(--my-cartela);"></div> የኔ ካርቴላ</div>
+    <!-- Main Game View -->
+    <div id="gameView" class="hidden">
+        <div class="game-header">
+            <div class="stat-box">GAME ID<br><span class="stat-val" id="gameId">#FB-5-7456</span></div>
+            <div class="stat-box">PLAYERS<br><span class="stat-val" id="playerCount">2</span></div>
+            <div class="stat-box">BET<br><span class="stat-val" id="betAmount">5 ETB</span></div>
+            <div class="stat-box">DERASH<br><span class="stat-val" id="derashAmount">32 ETB</span></div>
+            <div class="stat-box">TIMER<br><span class="stat-val" id="timerVal">15s</span></div>
+        </div>
+
+        <!-- Controls: Input Number & Quick Actions -->
+        <div class="controls-row">
+            <input type="number" id="cartelaInput" class="num-input" placeholder="ካርቴላ # (1-600)" onchange="handleManualInput()" min="1" max="600">
+            <button class="btn" onclick="handleManualInput()">ያዝ</button>
+            <button class="btn btn-gold" onclick="autoPickCartela()">ሲስተሙ ይምረጣልኝ</button>
+        </div>
+
+        <!-- Legend -->
+        <div style="display:flex; justify-content:space-around; font-size:12px; margin-bottom:8px;">
+            <span><span style="color:#64748b;">■</span> ክፍት</span>
+            <span><span style="color:var(--accent-red);">■</span> የተያዘ (ሌሎች)</span>
+            <span><span style="color:var(--accent-blue);">■</span> የኔ ካርቴላ</span>
+        </div>
+
+        <!-- 600 Cartela Selection Grid -->
+        <div class="cartela-picker-grid" id="cartelaGrid"></div>
+
+        <!-- Selected BINGO Cards Preview Container (2 visible, side-by-side) -->
+        <div style="font-weight:bold; font-size:14px; margin-top:10px; color:var(--accent-gold);">
+            ✨ የተያዙ ካርቴላዎች (<span id="selectedCount">0</span>)፦
+        </div>
+        <div class="active-cards-container" id="activeCardsContainer">
+            <div style="color:#64748b; font-size:12px; text-align:center; width:100%; padding:15px;">
+                እስካሁን ምንም ካርቴላ አልያዙም። ከላይ ቁጥር መርጠው ይያዙ!
+            </div>
+        </div>
+        
+        <button class="btn" style="width:100%; margin-top:15px; background:#334155;" onclick="backToRooms()">⬅️ ወደ ክፍሎች ተመለስ</button>
     </div>
 
-    <!-- 600 Grid Container -->
-    <div class="cartela-grid" id="cartelaGrid"></div>
-  </div>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+        let currentBalance = 100;
+        let currentBet = 5;
+        let mySelectedCartelas = [];
+        let takenByOthers = [5, 12, 45, 88, 120];
 
-    let userBalance = 100;
-    let currentRoomPrice = 5;
-    let mySelectedCartelas = [];
-    let takenCartelasByOthers = [5, 12, 45, 88];
-    let timerRunning = false;
-    let timerSeconds = 60;
-    let timerInterval = null;
-
-    document.getElementById('userBalance').innerText = `${userBalance} ETB`;
-    if(tg.initDataUnsafe && tg.initDataUnsafe.user) {
-      document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
-    }
-
-    function triggerWarning(msg) {
-      if(navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 300]);
-      const toast = document.getElementById('warningToast');
-      toast.innerText = msg;
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3000);
-    }
-
-    function enterRoom(price) {
-      currentRoomPrice = price;
-      document.getElementById('betAmount').innerText = `${price} ETB`;
-      document.getElementById('gameId').innerText = `#FB-${price}-${Math.floor(1000 + Math.random() * 9000)}`;
-      document.getElementById('roomView').classList.remove('active');
-      document.getElementById('gameView').classList.add('active');
-      renderGrid();
-    }
-
-    function renderGrid() {
-      const grid = document.getElementById('cartelaGrid');
-      grid.innerHTML = '';
-      for (let i = 1; i <= 600; i++) {
-        const btn = document.createElement('div');
-        btn.className = 'cartela-btn';
-        btn.innerText = i;
-
-        if (takenCartelasByOthers.includes(i)) {
-          btn.classList.add('taken');
-        } else if (mySelectedCartelas.includes(i)) {
-          btn.classList.add('my-selected');
+        // Set User Name from Telegram if available
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
         }
 
-        btn.onclick = () => toggleCartelaSelection(i);
-        grid.appendChild(btn);
-      }
-    }
-
-    function toggleCartelaSelection(num) {
-      if (takenCartelasByOthers.includes(num)) return;
-
-      if (mySelectedCartelas.includes(num)) {
-        mySelectedCartelas = mySelectedCartelas.filter(c => c !== num);
-      } else {
-        if (mySelectedCartelas.length >= 6) {
-          triggerWarning("⚠️ ከአንድ ጨዋታ እስከ 6 ካርቴላ ብቻ መያዝ ይችላሉ!");
-          return;
+        function updateBalanceDisplay() {
+            document.getElementById('userBalance').innerText = currentBalance;
         }
-        const totalRequired = (mySelectedCartelas.length + 1) * currentRoomPrice;
-        if (userBalance < totalRequired) {
-          triggerWarning("⚠️ በቂ ቀሪ ሂሳብ የለዎትም! እባክዎን ሂሳብዎን ይሙሉ::");
-          return;
+
+        function selectRoom(bet) {
+            currentBet = bet;
+            document.getElementById('betAmount').innerText = bet + " ETB";
+            document.getElementById('roomSelectionView').classList.add('hidden');
+            document.getElementById('gameView').classList.remove('hidden');
+            renderGrid();
         }
-        mySelectedCartelas.push(num);
-      }
 
-      updateGameCalculations();
-      renderGrid();
-    }
-
-    function autoSelectNumber(val) {
-      const num = parseInt(val);
-      if (num >= 1 && num <= 600) {
-        if (!mySelectedCartelas.includes(num)) {
-          toggleCartelaSelection(num);
+        function backToRooms() {
+            document.getElementById('gameView').classList.add('hidden');
+            document.getElementById('roomSelectionView').classList.remove('hidden');
         }
-      }
-    }
 
-    function autoPickBySystem() {
-      if (mySelectedCartelas.length >= 6) {
-        triggerWarning("⚠️ ከአንድ ጨዋታ እስከ 6 ካርቴላ ብቻ መያዝ ይችላሉ!");
-        return;
-      }
-      let randomNum;
-      do {
-        randomNum = Math.floor(Math.random() * 600) + 1;
-      } while (takenCartelasByOthers.includes(randomNum) || mySelectedCartelas.includes(randomNum));
-
-      toggleCartelaSelection(randomNum);
-
-      if(navigator.vibrate) navigator.vibrate([150, 50, 150]);
-      triggerWarning(`🎲 ሲስተሙ ካርቴላ ቁጥር ${randomNum} መርጦልዎታል!`);
-    }
-
-    function updateGameCalculations() {
-      const userHasCartela = mySelectedCartelas.length > 0;
-      let totalPlayersCount = (userHasCartela ? 1 : 0) + (takenCartelasByOthers.length > 0 ? 1 : 0);
-      document.getElementById('playersCount').innerText = totalPlayersCount;
-
-      const totalCartelasInGame = mySelectedCartelas.length + takenCartelasByOthers.length;
-      const totalPool = totalCartelasInGame * currentRoomPrice;
-      const derashNet = Math.floor(totalPool * 0.80);
-      document.getElementById('derashAmount').innerText = `${derashNet} ETB`;
-
-      document.getElementById('selectedBtnCount').innerText = `የተያዙ (${mySelectedCartelas.length})`;
-
-      if (totalPlayersCount >= 2 && !timerRunning) {
-        startTimer();
-      }
-    }
-
-    function startTimer() {
-      timerRunning = true;
-      timerSeconds = 60;
-      timerInterval = setInterval(() => {
-        timerSeconds--;
-        document.getElementById('timerCount').innerText = `${timerSeconds}s`;
-        if (timerSeconds <= 0) {
-          clearInterval(timerInterval);
-          alert("🎲 ጨዋታው ተጀምሯል!");
+        function renderGrid() {
+            const grid = document.getElementById('cartelaGrid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 600; i++) {
+                const btn = document.createElement('div');
+                btn.className = 'cartela-btn';
+                btn.innerText = i;
+                
+                if (mySelectedCartelas.includes(i)) {
+                    btn.classList.add('selected');
+                } else if (takenByOthers.includes(i)) {
+                    btn.classList.add('taken');
+                } else {
+                    btn.onclick = () => toggleSelectCartela(i);
+                }
+                grid.appendChild(btn);
+            }
         }
-      }, 1000);
-    }
-  </script>
+
+        function toggleSelectCartela(num) {
+            if (takenByOthers.includes(num)) {
+                alert('ይህ ካርቴላ በሌላ ተጫዋች ተይዟል!');
+                return;
+            }
+
+            const index = mySelectedCartelas.indexOf(num);
+            if (index > -1) {
+                // Return refund if unselected
+                mySelectedCartelas.splice(index, 1);
+                currentBalance += currentBet;
+            } else {
+                // Check balance
+                if (currentBalance < currentBet) {
+                    alert('በቂ ቀሪ ሂሳብ የለዎትም! እባክዎን ብር ይሙሉወ።');
+                    return;
+                }
+                mySelectedCartelas.push(num);
+                currentBalance -= currentBet;
+            }
+
+            updateBalanceDisplay();
+            renderGrid();
+            renderActiveCards();
+        }
+
+        // Smart Input Fix: Only triggers when enter/done is pressed or value changes completely
+        function handleManualInput() {
+            const input = document.getElementById('cartelaInput');
+            const val = parseInt(input.value);
+            if (val >= 1 && val <= 600) {
+                toggleSelectCartela(val);
+                input.value = '';
+            }
+        }
+
+        function autoPickCartela() {
+            let rand;
+            do {
+                rand = Math.floor(Math.random() * 600) + 1;
+            } while (mySelectedCartelas.includes(rand) || takenByOthers.includes(rand));
+            
+            toggleSelectCartela(rand);
+        }
+
+        // Generates deterministic pseudo-random 5x5 bingo numbers for a given cartela ID
+        function generateBingoNumbers(cartelaId) {
+            let card = [];
+            let cols = [
+                [1,15], [16,30], [31,45], [46,60], [61,75]
+            ];
+            for (let c = 0; c < 5; c++) {
+                let colNums = [];
+                let min = cols[c][0], max = cols[c][1];
+                for (let r = 0; r < 5; r++) {
+                    let num = min + ((cartelaId * (r + 1) * (c + 3)) % (max - min + 1));
+                    colNums.push(num);
+                }
+                card.push(colNums);
+            }
+            return card;
+        }
+
+        // Render Cards Side by Side (2 per view) with Horizontal Scroll
+        function renderActiveCards() {
+            const container = document.getElementById('activeCardsContainer');
+            document.getElementById('selectedCount').innerText = mySelectedCartelas.length;
+
+            if (mySelectedCartelas.length === 0) {
+                container.innerHTML = `<div style="color:#64748b; font-size:12px; text-align:center; width:100%; padding:15px;">እስካሁን ምንም ካርቴላ አልያዙም። ከላይ ቁጥር መርጠው ይያዙ!</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            mySelectedCartelas.forEach(cId => {
+                const cardData = generateBingoNumbers(cId);
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'bingo-card';
+
+                let gridHTML = `
+                    <div class="bingo-header-cell">B</div>
+                    <div class="bingo-header-cell">I</div>
+                    <div class="bingo-header-cell">N</div>
+                    <div class="bingo-header-cell">G</div>
+                    <div class="bingo-header-cell">O</div>
+                `;
+
+                for (let r = 0; r < 5; r++) {
+                    for (let c = 0; c < 5; c++) {
+                        if (r === 2 && c === 2) {
+                            gridHTML += `<div class="bingo-cell marked">★</div>`;
+                        } else {
+                            let num = cardData[c][r];
+                            gridHTML += `<div class="bingo-cell" onclick="this.classList.toggle('marked')">${num}</div>`;
+                        }
+                    }
+                }
+
+                cardDiv.innerHTML = `
+                    <div class="bingo-card-header">
+                        <span>ካርቴላ #${cId}</span>
+                        <span style="font-size:10px; opacity:0.8;">${currentBet} ETB</span>
+                    </div>
+                    <div class="bingo-grid">${gridHTML}</div>
+                    <button class="bingo-claim-btn" onclick="claimBingo(${cId})">🔥 BINGO!</button>
+                `;
+
+                container.appendChild(cardDiv);
+            });
+        }
+
+        function claimBingo(cartelaId) {
+            alert(`🎉 እንኳን ደስ አለዎት! በካርቴላ #${cartelaId} BINGO ብለዋል! አሸናፊነትዎ በመረጋገጥ ላይ ነው...`);
+        }
+
+        updateBalanceDisplay();
+    </script>
 </body>
 </html>
