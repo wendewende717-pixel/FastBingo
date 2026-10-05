@@ -1,26 +1,41 @@
-// Fast Bingo NextGen Pro - Exact Sync Engine with Beteseb Bingo
+// Fast Bingo NextGen Pro - Standard Bingo Engine
 
 let selectedCards = [];
 let takenCards = [];
-let allCardsData = {};
 
-// Load exact 600 cards from JSON file
-async function loadBingoCards() {
-    try {
-        const response = await fetch('/static/cards.json');
-        allCardsData = await response.json();
-        console.log("600 Bingo Cards loaded successfully and synced 100%!");
-    } catch (err) {
-        console.error("Failed to load synced cards, falling back to deterministic generator", err);
+// Professional 100% Standard BINGO Generator (B:1-15, I:16-30, N:31-45, G:46-60, O:61-75)
+function generateStandardBingoCard(cardId) {
+    function getSeededCol(min, max, count, seedOffset) {
+        let nums = [];
+        for (let i = min; i <= max; i++) nums.push(i);
+        
+        let seed = (cardId * 2654435761 + seedOffset * 40503) % 2147483647;
+        for (let i = nums.length - 1; i > 0; i--) {
+            seed = (seed * 16807) % 2147483647;
+            let j = Math.floor((seed / 2147483647) * (i + 1));
+            [nums[i], nums[j]] = [nums[j], nums[i]];
+        }
+        return nums.slice(0, count).sort((a, b) => a - b);
     }
-}
 
-function getBingoCard(cardId) {
-    if (allCardsData && allCardsData[cardId]) {
-        return allCardsData[cardId];
+    const b = getSeededCol(1, 15, 5, 101);
+    const i = getSeededCol(16, 30, 5, 202);
+    const n = getSeededCol(31, 45, 4, 303);
+    const g = getSeededCol(46, 60, 5, 404);
+    const o = getSeededCol(61, 75, 5, 505);
+
+    let grid = [];
+    for (let r = 0; r < 5; r++) {
+        let row = [
+            b[r],
+            i[r],
+            r === 2 ? '★' : (r > 2 ? n[r - 1] : n[r]),
+            g[r],
+            o[r]
+        ];
+        grid.push(row);
     }
-    // Fallback if card index not found
-    return [];
+    return grid;
 }
 
 // Toggle Cartela Selection (ድጋሜ ሲነካ ቁጥሩን ይለቃል)
@@ -87,7 +102,6 @@ function updateUI() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadBingoCards();
     if (window.Telegram && Telegram.WebApp) {
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
