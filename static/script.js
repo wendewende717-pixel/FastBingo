@@ -1,8 +1,8 @@
 let selectedCards = [];
 let takenCards = [];
-let currentRoom = 5;
+let currentBet = 5;
+let currentBalance = 100;
 
-// Standard BINGO Card Generator (600 Valid Cards)
 function generateStandardBingoCard(cardId) {
     function getSeededCol(min, max, count, seedOffset) {
         let nums = [];
@@ -36,123 +36,136 @@ function generateStandardBingoCard(cardId) {
     return grid;
 }
 
-// Toggle Cartela Selection
-function toggleCartelaSelection(cardId) {
+function showToast(msg) {
     if (window.Telegram && Telegram.WebApp && Telegram.WebApp.HapticFeedback) {
-        Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
     }
-    
+    const toast = document.getElementById('toastWarning');
+    if (toast) {
+        toast.innerText = msg;
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+}
+
+function selectRoom(bet) {
+    currentBet = bet;
+    document.getElementById('betAmount').innerText = bet + " ETB";
+    document.getElementById('roomSelectionView').classList.add('hidden');
+    document.getElementById('gameView').classList.remove('hidden');
+    renderGrid();
+}
+
+function goBack() {
+    if (!document.getElementById('gameView').classList.contains('hidden')) {
+        document.getElementById('gameView').classList.add('hidden');
+        document.getElementById('roomSelectionView').classList.remove('hidden');
+    }
+}
+
+function toggleCartelaSelection(cardId) {
     let index = selectedCards.indexOf(cardId);
     if (index > -1) {
         selectedCards.splice(index, 1);
-        showNotification(`ካርቴላ #${cardId} ተለቋል`, false);
+        currentBalance += currentBet;
     } else {
         if (selectedCards.length >= 6) {
-            showNotification("በአንድ ጨዋታ ከ 6 ካርቴላ በላይ መያዝ አይችሉም!", true);
+            showToast("በአንድ ጨዋታ ከ 6 ካርቴላ በላይ መያዝ አይችሉም!");
+            return;
+        }
+        if (currentBalance < currentBet) {
+            showToast("በቂ ቀሪ ሂሳብ የለዎትም! እባክዎን ብር ይሙሉ");
             return;
         }
         selectedCards.push(cardId);
-        showNotification(`ካርቴላ #${cardId} ተይዟል`, false);
+        currentBalance -= currentBet;
     }
+    document.getElementById('userBalance').innerText = currentBalance;
     renderGrid();
-    renderSelectedCards();
+    renderActiveCards();
 }
 
-// Auto Select Card
-function autoSelectCard() {
+function handleManualInput() {
+    const input = document.getElementById('cartelaInput');
+    const val = parseInt(input.value);
+    if (val >= 1 && val <= 600) {
+        toggleCartelaSelection(val);
+        input.value = '';
+    }
+}
+
+function autoPickCartela() {
+    if (selectedCards.length >= 6) {
+        showToast("በአንድ ጨዋታ ከ 6 ካርቴላ በላይ መያዝ አይችሉም!");
+        return;
+    }
+    let rand;
+    do {
+        rand = Math.floor(Math.random() * 600) + 1;
+    } while (selectedCards.includes(rand) || takenCards.includes(rand));
+    
     if (window.Telegram && Telegram.WebApp && Telegram.WebApp.HapticFeedback) {
         Telegram.WebApp.HapticFeedback.impactOccurred('medium');
     }
-    
-    let available = [];
-    for (let i = 1; i <= 600; i++) {
-        if (!takenCards.includes(i) && !selectedCards.includes(i)) {
-            available.push(i);
-        }
-    }
-    if (available.length > 0 && selectedCards.length < 6) {
-        let randomCard = available[Math.floor(Math.random() * available.length)];
-        selectedCards.push(randomCard);
-        showNotification(`ሲስተሙ ካርቴላ #${randomCard} መርጦልዎታል!`, false);
-        renderGrid();
-        renderSelectedCards();
-    }
+    showToast(`ሲስተሙ ካርቴላ #${rand} መርጦልዎታል!`);
+    toggleCartelaSelection(rand);
 }
 
-// Clean Toast Notification
-function showNotification(msg, isError = false) {
-    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.HapticFeedback) {
-        Telegram.WebApp.HapticFeedback.notificationOccurred(isError ? 'error' : 'success');
-    }
-    const alertBox = document.getElementById('alert-box');
-    if (alertBox) {
-        alertBox.innerText = msg;
-        alertBox.className = `alert-box show ${isError ? 'error' : 'success'}`;
-        setTimeout(() => alertBox.classList.remove('show'), 3000);
-    } else {
-        alert(msg);
-    }
-}
-
-// Render 1-80 Grid
 function renderGrid() {
-    const gridContainer = document.getElementById('cartela-grid');
-    if (!gridContainer) return;
-    
-    let html = '';
+    const grid = document.getElementById('cartelaGrid');
+    grid.innerHTML = '';
     for (let i = 1; i <= 80; i++) {
-        let isSelected = selectedCards.includes(i);
-        let isTaken = takenCards.includes(i);
-        let btnClass = 'grid-btn';
-        if (isSelected) btnClass += ' selected';
-        if (isTaken) btnClass += ' taken';
-        
-        html += `<button class="${btnClass}" onclick="toggleCartelaSelection(${i})">${i}</button>`;
+        const btn = document.createElement('div');
+        btn.className = 'cartela-btn';
+        btn.innerText = i;
+        if (selectedCards.includes(i)) btn.classList.add('selected');
+        btn.onclick = () => toggleCartelaSelection(i);
+        grid.appendChild(btn);
     }
-    gridContainer.innerHTML = html;
 }
 
-// Render Selected Cartelas with Bingo Standard Numbers
-function renderSelectedCards() {
-    const container = document.getElementById('selected-cartelas-container');
-    const countElem = document.getElementById('selected-count');
-    if (countElem) countElem.innerText = selectedCards.length;
-    if (!container) return;
+function renderActiveCards() {
+    const container = document.getElementById('activeCardsContainer');
+    document.getElementById('selectedCount').innerText = selectedCards.length;
 
-    let html = '';
-    selectedCards.forEach(cardId => {
-        let matrix = generateStandardBingoCard(cardId);
-        html += `<div class="cartela-card">
-            <div class="cartela-header">Cartela No : ${cardId}</div>
-            <div class="bingo-header-row">
-                <span>B</span><span>I</span><span>N</span><span>G</span><span>O</span>
-            </div>
-            <div class="bingo-grid-matrix">`;
-        
-        matrix.forEach(row => {
-            row.forEach(val => {
-                let cellClass = val === '★' ? 'cell free' : 'cell';
-                html += `<div class="${cellClass}">${val}</div>`;
-            });
-        });
-        
-        html += `</div>
-            <button class="bingo-btn">🔥 BINGO</button>
-        </div>`;
+    if (selectedCards.length === 0) {
+        container.innerHTML = `<div style="color:#64748b; font-size:11px; text-align:center; width:100%; padding:10px;">ምንም ካርቴላ አልያዙም። ከላይ ቁጥር መርጠው ይያዙ!</div>`;
+        return;
+    }
+
+    container.innerHTML = '';
+    selectedCards.forEach(cId => {
+        const cardData = generateStandardBingoCard(cId);
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'bingo-card';
+
+        let gridHTML = `
+            <div class="b-head">B</div>
+            <div class="i-head">I</div>
+            <div class="n-head">N</div>
+            <div class="g-head">G</div>
+            <div class="o-head">O</div>
+        `;
+
+        for (let r = 0; r < 5; r++) {
+            for (let c = 0; c < 5; c++) {
+                if (r === 2 && c === 2) {
+                    gridHTML += `<div class="bingo-cell marked">★</div>`;
+                } else {
+                    let num = cardData[c][r];
+                    gridHTML += `<div class="bingo-cell">${num}</div>`;
+                }
+            }
+        }
+
+        cardDiv.innerHTML = `
+            <div class="bingo-card-title">Cartela No : ${cId}</div>
+            <div class="bingo-grid">${gridHTML}</div>
+            <button class="bingo-claim-btn" onclick="alert('🔥 BINGO!')">🔥 BINGO</button>
+        `;
+
+        container.appendChild(cardDiv);
     });
-    container.innerHTML = html;
-}
-
-function selectRoom(roomAmount) {
-    currentRoom = roomAmount;
-    document.getElementById('room-selection-screen').style.display = 'none';
-    document.getElementById('game-screen').style.display = 'block';
-    renderGrid();
-}
-
-function backToRooms() {
-    document.getElementById('room-selection-screen').style.display = 'block';
-    document.getElementById('game-screen').style.display = 'none';
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -160,5 +173,4 @@ document.addEventListener("DOMContentLoaded", () => {
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
     }
-    renderGrid();
 });

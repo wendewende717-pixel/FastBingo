@@ -2,64 +2,394 @@
 <html lang="am">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Fast Bingo Bot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Bingo NextGen Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        :root {
+            --bg-dark: #0a0f1d;
+            --card-bg: #151d30;
+            --accent-gold: #f59e0b;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --text-main: #f8fafc;
+        }
+
+        body {
+            margin: 0;
+            padding: 6px;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            user-select: none;
+            padding-bottom: 60px;
+        }
+
+        /* Top Header Bar */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #111827;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 8px;
+        }
+
+        .nav-top-btn {
+            background: #1f2937;
+            color: #9ca3af;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-summary {
+            display: flex;
+            gap: 8px;
+            font-size: 11px;
+            align-items: center;
+        }
+
+        .wallet-pill {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 800;
+        }
+
+        /* Rooms Selection Grid */
+        .rooms-title {
+            text-align: center;
+            color: var(--accent-gold);
+            margin: 10px 0;
+            font-size: 15px;
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .room-card {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .room-card h3 {
+            margin: 0;
+            color: var(--accent-gold);
+            font-size: 14px;
+        }
+
+        .room-card p {
+            margin: 4px 0 0 0;
+            color: #60a5fa;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .vip-card {
+            grid-column: span 2;
+            border-color: var(--accent-gold);
+            background: linear-gradient(145deg, #151d30, #312e81);
+        }
+
+        /* Game Header Stats */
+        .game-header {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            background: #151d30;
+            padding: 6px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 10px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-box {
+            background: #0a0f1d;
+            padding: 4px 2px;
+            border-radius: 4px;
+            color: #94a3b8;
+        }
+
+        .stat-val {
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        /* Controls Input Row */
+        .controls-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .num-input {
+            flex: 1;
+            background: #151d30;
+            border: 1px solid var(--accent-blue);
+            border-radius: 6px;
+            color: #fff;
+            padding: 6px 8px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .btn {
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+        }
+
+        /* 1-80 Grid */
+        .cartela-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 3px;
+            max-height: 250px;
+            overflow-y: auto;
+            background: #060913;
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 8px;
+        }
+
+        .cartela-btn {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #f1f5f9;
+            padding: 6px 0;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .cartela-btn.selected {
+            background: var(--accent-green) !important;
+            color: #fff;
+            box-shadow: 0 0 6px var(--accent-green);
+        }
+
+        .cartela-btn.taken {
+            background: #dc2626 !important;
+            opacity: 0.85;
+            cursor: not-allowed;
+        }
+
+        /* Selected BINGO Cards Container */
+        .active-cards-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 6px 4px;
+            scroll-snap-type: x mandatory;
+            background: #04060d;
+            border-radius: 10px;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .bingo-card {
+            flex: 0 0 calc(50% - 4px);
+            scroll-snap-align: start;
+            background: #0f172a;
+            border: 1px solid var(--accent-gold);
+            border-radius: 8px;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .bingo-card-title {
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--accent-gold);
+            margin-bottom: 4px;
+        }
+
+        .bingo-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            text-align: center;
+        }
+
+        .b-head { background: var(--accent-blue); color: #fff; font-weight: 900; font-size: 10px; border-radius: 2px; padding: 2px 0; }
+        .i-head { background: var(--accent-purple); color: #fff; font-weight: 900; font-size: 10px; border-radius: 2px; padding: 2px 0; }
+        .n-head { background: var(--accent-pink); color: #fff; font-weight: 900; font-size: 10px; border-radius: 2px; padding: 2px 0; }
+        .g-head { background: var(--accent-green); color: #fff; font-weight: 900; font-size: 10px; border-radius: 2px; padding: 2px 0; }
+        .o-head { background: var(--accent-gold); color: #000; font-weight: 900; font-size: 10px; border-radius: 2px; padding: 2px 0; }
+
+        .bingo-cell {
+            background: #1e293b;
+            color: #fff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 4px 0;
+            border-radius: 3px;
+        }
+
+        .bingo-cell.marked {
+            background: var(--accent-green);
+            color: #fff;
+        }
+
+        .bingo-claim-btn {
+            width: 100%;
+            margin-top: 6px;
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: #fff;
+            border: none;
+            padding: 5px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: #111827;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 999;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6b7280;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--accent-blue);
+        }
+
+        .toast-warning {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #dc2626;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
-    <div id="alert-box" class="alert-box"></div>
+
+    <div id="toastWarning" class="toast-warning"></div>
 
     <!-- Header Bar -->
-    <div class="header">
-        <button class="nav-btn" onclick="backToRooms()">← Back</button>
-        <div class="user-info">
-            <span id="user-name">Wende</span>
-            <span class="balance-badge" id="user-balance">100 ETB</span>
+    <div class="top-header">
+        <button class="nav-top-btn" onclick="goBack()">← Back</button>
+        <div class="user-summary">
+            <span id="userName" style="font-weight:bold;">Wende</span>
+            <span class="wallet-pill"><span id="userBalance">100</span> ETB</span>
         </div>
-        <button class="nav-btn" onclick="location.reload()">🔄 Refresh</button>
+        <button class="nav-top-btn" onclick="location.reload()">🔄 Refresh</button>
     </div>
 
-    <!-- ROOM SELECTION SCREEN -->
-    <div id="room-selection-screen" class="screen">
-        <h2 class="title">🎯 የጨዋታ ክፍል ይምረጡ</h2>
+    <!-- Room Selection Screen -->
+    <div id="roomSelectionView">
+        <h4 class="rooms-title">🎯 የጨዋታ ክፍል ይምረጡ</h4>
         <div class="rooms-grid">
-            <button class="room-card" onclick="selectRoom(5)"><h3>ክፍል 5</h3><p>5 ETB</p></button>
-            <button class="room-card" onclick="selectRoom(10)"><h3>ክፍል 10</h3><p>10 ETB</p></button>
-            <button class="room-card" onclick="selectRoom(15)"><h3>ክፍል 15</h3><p>15 ETB</p></button>
-            <button class="room-card" onclick="selectRoom(20)"><h3>ክፍል 20</h3><p>20 ETB</p></button>
-            <button class="room-card" onclick="selectRoom(25)"><h3>ክፍል 25</h3><p>25 ETB</p></button>
-            <button class="room-card" onclick="selectRoom(50)"><h3>ክፍል 50</h3><p>50 ETB</p></button>
-            <button class="room-card" onclick="selectRoom(100)"><h3>ክፍል 100</h3><p>100 ETB</p></button>
-            <button class="room-card" onclick="selectRoom(200)"><h3>ክፍል 200</h3><p>200 ETB</p></button>
-            <button class="room-card vip-room" onclick="selectRoom(500)"><h3>👑 VIP ክፍል</h3><p>500 ETB</p></button>
+            <div class="room-card" onclick="selectRoom(5)"><h3>ክፍል 5</h3><p>5 ETB</p></div>
+            <div class="room-card" onclick="selectRoom(10)"><h3>ክፍል 10</h3><p>10 ETB</p></div>
+            <div class="room-card" onclick="selectRoom(15)"><h3>ክፍል 15</h3><p>15 ETB</p></div>
+            <div class="room-card" onclick="selectRoom(20)"><h3>ክፍል 20</h3><p>20 ETB</p></div>
+            <div class="room-card" onclick="selectRoom(25)"><h3>ክፍል 25</h3><p>25 ETB</p></div>
+            <div class="room-card" onclick="selectRoom(50)"><h3>ክፍል 50</h3><p>50 ETB</p></div>
+            <div class="room-card" onclick="selectRoom(100)"><h3>ክፍል 100</h3><p>100 ETB</p></div>
+            <div class="room-card" onclick="selectRoom(200)"><h3>ክፍል 200</h3><p>200 ETB</p></div>
+            <div class="room-card vip-card" onclick="selectRoom(500)"><h3 style="color:#fff;">👑 VIP ክፍል 500</h3><p style="color:var(--accent-gold);">500 ETB</p></div>
         </div>
     </div>
 
-    <!-- GAME PLAY SCREEN -->
-    <div id="game-screen" class="screen" style="display:none;">
-        <div class="game-meta">
-            <div>GAME ID<br><b>#FB-5-7456</b></div>
-            <div>PLAYERS<br><b>2</b></div>
-            <div>BET<br><b id="current-bet">20 ETB</b></div>
-            <div>DERASH<br><b>40 ETB</b></div>
-            <div>TIMER<br><b id="timer-display">30s</b></div>
+    <!-- Main Game View -->
+    <div id="gameView" class="hidden">
+        <div class="game-header">
+            <div class="stat-box">GAME ID<br><span class="stat-val">#FB-5-7456</span></div>
+            <div class="stat-box">PLAYERS<br><span class="stat-val">2</span></div>
+            <div class="stat-box">BET<br><span class="stat-val" id="betAmount">20 ETB</span></div>
+            <div class="stat-box">DERASH<br><span class="stat-val">40 ETB</span></div>
+            <div class="stat-box">TIMER<br><span class="stat-val">30s</span></div>
         </div>
 
-        <div class="controls-bar">
-            <input type="text" placeholder="ካርቴላ # (1-600)" id="manual-input">
-            <button class="btn-primary" onclick="autoSelectCard()">ያዝ</button>
-            <button class="btn-warning" onclick="autoSelectCard()">ሲስተሙ ይምረጡልዎት</button>
+        <div class="controls-row">
+            <input type="number" id="cartelaInput" class="num-input" placeholder="ካርቴላ # (1-600)" onchange="handleManualInput()" min="1" max="600">
+            <button class="btn" onclick="handleManualInput()">ያዝ</button>
+            <button class="btn btn-gold" onclick="autoPickCartela()">ሲስተሙ ይምረጣልኝ</button>
         </div>
 
-        <!-- Grid 1-80 -->
-        <div id="cartela-grid" class="cartela-grid-80"></div>
+        <!-- 1-80 Grid -->
+        <div class="cartela-picker-grid" id="cartelaGrid"></div>
 
-        <div class="selected-header">
-            ✨ የተያዙ ካርቴላዎች (<span id="selected-count">0</span>/6):-
+        <div style="font-weight:bold; font-size:11px; margin: 6px 0; color:var(--accent-gold);">
+            ✨ የተያዙ ካርቴላዎች (<span id="selectedCount">0</span>/6)፦
         </div>
+        <div class="active-cards-container" id="activeCardsContainer">
+            <div style="color:#64748b; font-size:11px; text-align:center; width:100%; padding:10px;">
+                ምንም ካርቴላ አልያዙም። ከላይ ቁጥር መርጠው ይያዙ!
+            </div>
+        </div>
+    </div>
 
-        <div id="selected-cartelas-container" class="cartelas-list"></div>
+    <!-- Bottom Nav Bar -->
+    <div class="bottom-nav">
+        <div class="nav-item active"><div>🎮</div><span>Game</span></div>
+        <div class="nav-item"><div>📜</div><span>History</span></div>
+        <div class="nav-item"><div>👛</div><span>Wallet</span></div>
+        <div class="nav-item"><div>👤</div><span>Profile</span></div>
     </div>
 
     <script src="/static/script.js"></script>
